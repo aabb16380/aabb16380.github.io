@@ -83,7 +83,15 @@
     fetch(VURL + '/rest/v1/rpc/bump_views', {
       method: 'POST',
       headers: H,
-      body: JSON.stringify({ p_slug: post.slug })
+      body: JSON.stringify({
+        p_slug: post.slug,
+        p_title: post.title || post.slug,
+        p_cat: post.cat || 'other',
+        p_date: post.date || null,
+        p_excerpt: post.excerpt || null,
+        p_byline: post.byline || null,
+        p_body: post.body || null
+      })
     })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
       .then(function (n) { paintViews(n); post.views = n; })

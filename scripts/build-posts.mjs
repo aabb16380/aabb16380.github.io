@@ -41,6 +41,22 @@ function toHtml(body) {
 const cats = JSON.parse(fs.readFileSync(catsFile, 'utf8'));
 
 const files = fs.readdirSync(postsDir).filter((f) => f.endsWith('.md'));
+// slug 冲突检查：两篇同名会让数据库主键互相覆盖，阅读数也就统计不到
+{
+  const seen = new Map();
+  for (const file of files) {
+    const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
+    const { data } = parseFrontMatter(raw);
+    const slug = data.slug || file.replace(/\.md$/, '');
+    if (seen.has(slug)) {
+      console.error('[build-posts] slug 冲突：' + seen.get(slug) + ' 与 ' + file + ' 都用了 "' + slug + '"');
+      console.error('  请给其中一个换一个 slug，否则两篇会互相覆盖、阅读数也无法统计。');
+      process.exit(1);
+    }
+    seen.set(slug, file);
+  }
+}
+
 const posts = files
   .map((file) => {
     const raw = fs.readFileSync(path.join(postsDir, file), 'utf8');
