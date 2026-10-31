@@ -62,17 +62,38 @@
     var key = 'zj_viewed_' + post.slug;
     var seen = false;
     try { seen = sessionStorage.getItem(key) === '1'; } catch (e) {}
-    if (seen) return;
+
+    var H = { apikey: VKEY, Authorization: 'Bearer ' + VKEY, 'Content-Type': 'application/json' };
+
+    if (seen) {
+      // 本会话已经记过数：只读当前值，避免重复 +1，也避免一直显示 0
+      fetch(VURL + '/rest/v1/posts?slug=eq.' + encodeURIComponent(post.slug) + '&select=views', { headers: H })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .then(function (rows) {
+          var v = rows && rows[0] ? rows[0].views : 0;
+          paintViews(v);
+          post.views = v;
+        })
+        .catch(function () {});
+      return;
+    }
+
     try { sessionStorage.setItem(key, '1'); } catch (e) {}
 
     fetch(VURL + '/rest/v1/rpc/bump_views', {
       method: 'POST',
-      headers: { apikey: VKEY, Authorization: 'Bearer ' + VKEY, 'Content-Type': 'application/json' },
+      headers: H,
       body: JSON.stringify({ p_slug: post.slug })
     })
       .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
       .then(function (n) { paintViews(n); post.views = n; })
-      .catch(function () { /* 没跑补丁时静默 */ });
+      .catch(function () {
+        // 计数失败也要把真实数字显示出来
+        fetch(VURL + '/rest/v1/posts?slug=eq.' + encodeURIComponent(post.slug) + '&select=views', { headers: H })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (rows) { if (rows && rows[0]) paintViews(rows[0].views); })
+          .catch(function () {});
+      });
   }
 
   // 管理员点「阅读 N」改数字

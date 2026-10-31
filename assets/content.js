@@ -33,7 +33,7 @@
     }
 
     var q = '/rest/v1/posts?published=eq.true' +
-      '&select=slug,cat,title,date,byline,excerpt,body,sort_order' +
+      '&select=slug,cat,title,date,byline,excerpt,body,sort_order,views' +
       '&order=date.desc,sort_order.asc';
 
     return fetch(base + q, { headers: { apikey: key, Authorization: 'Bearer ' + key } })
