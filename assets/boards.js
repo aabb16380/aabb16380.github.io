@@ -286,6 +286,10 @@
   }
 
   var lightbox = $('lightbox');
+  // iOS：fixed 元素若处在有 transform 的祖先里会失效，直接挂到 body
+  if (lightbox && lightbox.parentNode !== document.body) {
+    document.body.appendChild(lightbox);
+  }
   var lbImg = $('lightbox-img');
   var lbCap = $('lightbox-caption');
   var lbStars = $('lightbox-stars');
@@ -305,6 +309,8 @@
     try { mine = Number(localStorage.getItem('zj_photo_' + p.id) || 0); } catch (e) {}
     // 保留带 data-kind / data-id 的外层，否则点击时读不到图片 id
     lbStars.innerHTML = starsHtml(p.id, mine, 'photo');
+    var fb = document.getElementById('lightbox-open');
+    if (fb) { fb.href = p.url; }
     lbImg.onerror = function () {
       lbCap.textContent = '这张图浏览器显示不了（可能是 HEIC 格式），管理员可以删掉它。';
       lbStars.innerHTML = '';
