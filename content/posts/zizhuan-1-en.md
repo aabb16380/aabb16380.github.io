@@ -1,5 +1,5 @@
 ---
-slug: "zizhuan-1"
+slug: "zizhuan-1-en"
 cat: "zi"
 title: "Autobioligy - Scatter notes after NHSML '26"
 date: "2026-09-21"
