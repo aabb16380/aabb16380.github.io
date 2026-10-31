@@ -1,0 +1,41 @@
+# Pages CMS 配置 —— https://pagescms.org
+# 登录方式：在 https://app.pagescms.org 用 GitHub 账号登录，选择仓库
+#           aabb16380/aabb16380.github.io
+# 后台地址：https://app.pagescms.org
+# 说明：这里改的是 content/posts/*.md，提交后 GitHub Actions 会自动
+#       重新生成 assets/posts.js，站点随即更新（约 1 分钟）。
+
+media: assets/uploads
+
+content:
+  - name: posts
+    label: 文章
+    type: collection
+    path: content/posts
+    filename: "{fields.slug}.md"
+    view:
+      fields: [date, cat, title, excerpt]
+      primary: title
+      sort: [date, order]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - { name: title, label: 标题, type: string, required: true }
+      - { name: slug, label: 链接标识, type: string, required: true, options: { maxlength: 60 }, description: "英文/数字/短横线，发布后不要改，否则旧链接会失效" }
+      - name: cat
+        label: 栏目
+        type: select
+        required: true
+        options:
+          values:
+            - { label: 宙金列传, value: zhuan }
+            - { label: 宙金自传, value: zi }
+            - { label: 咏宙金, value: yong }
+            - { label: 其他文章, value: other }
+      - { name: date, label: 发布日期, type: date, required: true }
+      - { name: byline, label: 落款（可选）, type: string, description: "例如：北京*中 · 高二 8 班 · 赵子涵" }
+      - { name: excerpt, label: 摘要, type: text, required: true, options: { rows: 2 }, description: "列表里显示的一两句话" }
+      - { name: order, label: 同日排序, type: number, hidden: true, default: 999 }
+      - { name: sample, label: 标记为示例, type: boolean, hidden: true }
+      - { name: body, label: 正文, type: rich-text }
