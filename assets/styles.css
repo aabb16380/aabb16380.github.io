@@ -1448,3 +1448,23 @@ img.brand-mark { object-fit: cover; }
   left: 0;
 }
 .lightbox { -webkit-overflow-scrolling: touch; }
+/* ---------- 顶部版本条 ---------- */
+.build-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 18px;
+  background: #000;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  color: #6b6b73;
+  position: relative;
+  z-index: 60;
+}
+.build-bar .bb-right { color: var(--brand); }
+@media (max-width: 720px) {
+  .build-bar { padding: 3px 12px; font-size: 10px; }
+}

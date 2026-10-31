@@ -13,24 +13,34 @@
 <meta property="og:title" content="文章 | zhoujin.site">
 <meta property="og:url" content="https://zhoujin.site/article.html">
 
-<link rel="icon" href="assets/favicon.png?v=20261031u" type="image/png">
+<link rel="icon" href="assets/favicon.png?v=20261031v" type="image/png">
 <script>
+window.ZJ_BUILD = '20261031v';
 window.__ZJ_T = (function () {
   var m = (location.search || '').match(/[?&]t=([^&]+)/);
   return m ? '&t=' + encodeURIComponent(m[1]) : '';
 })();
-document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031u' + window.__ZJ_T + '">');
+document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031v' + window.__ZJ_T + '">');
 </script>
 
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
+<div class="build-bar" id="build-bar"><span class="bb-left">BUILD 20261031v</span><span class="bb-right" id="bb-right"></span></div>
+<script>
+(function () {
+  var m = (location.search || '').match(/[?&]t=([^&]+)/);
+  var el = document.getElementById('bb-right');
+  if (el) el.textContent = m ? 'TEST ' + m[1] : 'STABLE';
+})();
+</script>
+
 <a class="skip-link" href="#main">跳到主要内容</a>
 
 <header class="site-header" id="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html" aria-label="返回首页">
-      <img class="brand-mark" src="assets/icon.png?v=20261031u" alt="宙金" width="34" height="34">
+      <img class="brand-mark" src="assets/icon.png?v=20261031v" alt="宙金" width="34" height="34">
       <span class="brand-name">zhoujin.site</span>
     </a>
 
@@ -121,7 +131,7 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031u' + wi
     ['assets/comments.js', true]
   ];
   for (var i = 0; i < list.length; i++) {
-    document.write('<script src="' + list[i][0] + '?v=20261031u' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
+    document.write('<script src="' + list[i][0] + '?v=20261031v' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
   }
 })();
 </script>
