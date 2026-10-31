@@ -15,7 +15,7 @@
   var H = { apikey: key, Authorization: 'Bearer ' + key };
   var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
 
-  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed', gallerySort: 'mixed' };
+  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed', deedExpanded: false, gallerySort: 'mixed' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -158,7 +158,9 @@
         if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
       }
       return String(b.created_at).localeCompare(String(a.created_at));
-    }).slice(0, 3);
+    });
+    var total = rows.length;
+    if (!state.deedExpanded) rows = rows.slice(0, 3);
 
     list.innerHTML = rows.map(function (d) {
       var a = avg(d.score_sum, d.score_count);
@@ -190,6 +192,16 @@
       ].map(function (o) {
         return '<button type="button" class="sort-chip' + (o.k === state.deedSort ? ' active' : '') + '" data-sort="' + o.k + '">' + o.n + '</button>';
       }).join('');
+    }
+
+    var dMore = $('deed-more');
+    if (dMore) {
+      if (total > 3) {
+        dMore.hidden = false;
+        dMore.textContent = state.deedExpanded ? '收起 ↑' : '查看全部 ' + total + ' 条 ↓';
+      } else {
+        dMore.hidden = true;
+      }
     }
 
     var adminRow = $('deed-admin');
@@ -546,6 +558,13 @@
     e.stopPropagation();
     if (window.confirm('删除这张图片？')) deletePhoto(b.getAttribute('data-id'));
   }, true);
+  var dMoreBtn = document.getElementById('deed-more');
+  if (dMoreBtn) {
+    dMoreBtn.addEventListener('click', function () {
+      state.deedExpanded = !state.deedExpanded;
+      renderDeeds();
+    });
+  }
   var gMore = document.getElementById('gallery-more');
   if (gMore) {
     gMore.addEventListener('click', function () {
