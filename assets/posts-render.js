@@ -21,6 +21,7 @@
   var posts = [];
   var likes = {};
   var views = {};
+  var comments = {};
   var active = 'all';
   var sortMode = 'mixed';   // 综合（默认）
   var expanded = false;
@@ -47,6 +48,7 @@
 
   function likeOf(slug) { return Number(likes[slug] || 0); }
   function viewsOf(slug) { return Number(views[slug] || 0); }
+  function commentsOf(slug) { return Number(comments[slug] || 0); }
 
   function loadLikes() {
     if (!base || !key) return Promise.resolve();
@@ -67,6 +69,16 @@
             (rows || []).forEach(function (r) { views[r.slug] = r.views; });
           })
           .catch(function () {});
+      })
+      .then(function () {
+        return fetch(base + '/rest/v1/post_comments?select=slug', {
+          headers: { apikey: key, Authorization: 'Bearer ' + key }
+        })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (rows) {
+            (rows || []).forEach(function (r) { comments[r.slug] = (comments[r.slug] || 0) + 1; });
+          })
+          .catch(function () {});
       });
   }
 
@@ -77,9 +89,9 @@
         if (la !== lb) return lb - la;
       }
       if (sortMode === 'mixed') {
-        // 综合 = 点赞 × 2 + 阅读
-        var ma = likeOf(a.slug) * 2 + viewsOf(a.slug);
-        var mb = likeOf(b.slug) * 2 + viewsOf(b.slug);
+        // 综合 = 阅读 + 点赞 × 4 + 评论 × 2
+        var ma = viewsOf(a.slug) + likeOf(a.slug) * 4 + commentsOf(a.slug) * 2;
+        var mb = viewsOf(b.slug) + likeOf(b.slug) * 4 + commentsOf(b.slug) * 2;
         if (ma !== mb) return mb - ma;
       }
       if (a.date !== b.date) return String(a.date) < String(b.date) ? 1 : -1;

@@ -1558,3 +1558,14 @@ body.admin-mode .view-count:hover { color: var(--brand); border-bottom-color: va
   color: var(--muted);
   opacity: .8;
 }
+/* ---------- 经历：管理员按钮 ---------- */
+.tl-admin {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.tl-admin .admin-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+.tl-admin .admin-btn.danger { color: #ff6b5c; border-color: rgba(255, 107, 92, .45); }
