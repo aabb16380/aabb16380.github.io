@@ -18,7 +18,13 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="assets/favicon.png?v=20261031u" type="image/png">
-<link rel="stylesheet" href="assets/styles.css?v=20261031u">
+<script>
+window.__ZJ_T = (function () {
+  var m = (location.search || '').match(/[?&]t=([^&]+)/);
+  return m ? '&t=' + encodeURIComponent(m[1]) : '';
+})();
+document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031u' + window.__ZJ_T + '">');
+</script>
 
 <!-- 尽早标记 js，避免动画元素先显示再隐藏 -->
 <script>document.documentElement.classList.add('js');</script>
@@ -232,12 +238,22 @@
   </div>
 </footer>
 
-<script src="assets/site-config.js?v=20261031u"></script>
-<script src="assets/posts.js?v=20261031u"></script>
-<script src="assets/content.js?v=20261031u"></script>
-<script src="assets/admin.js?v=20261031u" defer></script>
-<script src="assets/boards.js?v=20261031u" defer></script>
-<script src="assets/posts-render.js?v=20261031u" defer></script>
-<script src="assets/main.js?v=20261031u" defer></script>
+<script>
+(function () {
+  var T = window.__ZJ_T || '';
+  var list = [
+    ['assets/site-config.js', false],
+    ['assets/posts.js', false],
+    ['assets/content.js', false],
+    ['assets/admin.js', true],
+    ['assets/boards.js', true],
+    ['assets/posts-render.js', true],
+    ['assets/main.js', true]
+  ];
+  for (var i = 0; i < list.length; i++) {
+    document.write('<script src="' + list[i][0] + '?v=20261031u' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
+  }
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>正在加载最新版…</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: #050507;
+    color: #b3ada3;
+    font: 14px/1.7 system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+  a { color: #ff5a3c; }
+</style>
+</head>
+<body>
+  <div>
+    <p>正在加载最新版…</p>
+    <p><a id="manual" href="/">如果没有自动跳转，点这里</a></p>
+  </div>
+<script>
+(function () {
+  // 每次访问都生成新的时间戳，绕过浏览器与 CDN 的缓存
+  var q = location.search || '';
+  var m = q.match(/[?&]to=([^&]+)/);
+  var to = m ? decodeURIComponent(m[1]) : '/';
+  if (!/^[a-z0-9._-]+(\.html)?(\?[^\s]*)?$/i.test(to) && to !== '/') { to = '/'; }
+  var sep = to.indexOf('?') > -1 ? '&' : '?';
+  var target = to + sep + 't=' + Date.now();
+  document.getElementById('manual').setAttribute('href', target);
+  location.replace(target);
+})();
+</script>
+</body>
+</html>
