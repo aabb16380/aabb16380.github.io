@@ -144,15 +144,17 @@
       var a = avg(d.score_sum, d.score_count);
       var mine = 0;
       try { mine = Number(localStorage.getItem('zj_deed_' + d.id) || 0); } catch (e) {}
-      return '<article class="deed">' +
-        '<p class="deed-body">' + esc(d.body) + '</p>' +
-        '<div class="deed-foot">' +
-          starsHtml(d.id, mine, 'deed') +
-          '<span class="deed-score">' +
-            (a === null ? '未评分' : a.toFixed(1) + ' 分 · ' + d.score_count + ' 人') +
-          '</span>' +
-          (isAdmin() ? '<button class="deed-del admin-btn" data-id="' + d.id + '" type="button">删除</button>' : '') +
+      return '<article class="deed" data-id="' + d.id + '" tabindex="0" role="button" aria-label="给「' + esc(d.body) + '」评分">' +
+        '<div class="deed-main">' +
+          '<p class="deed-body">' + esc(d.body) + '</p>' +
+          '<p class="deed-sub">' + (mine ? '你打了 ' + mine + ' 星' : '点卡片打分') + '</p>' +
         '</div>' +
+        '<div class="deed-side">' +
+          '<span class="deed-score-big">' + (a === null ? '5.0' : a.toFixed(1)) + '</span>' +
+          '<span class="deed-score-unit">分</span>' +
+          '<span class="deed-score-who">' + (d.score_count || 0) + ' 人评分</span>' +
+        '</div>' +
+        (isAdmin() ? '<button class="deed-del admin-btn" data-id="' + d.id + '" type="button">删除</button>' : '') +
       '</article>';
     }).join('');
 
@@ -249,9 +251,62 @@
 
   function closePhoto() { lightbox.hidden = true; currentPhoto = null; }
 
+  /* ---------------- 事迹评分弹窗 ---------------- */
+  var rateMask = null;
+  var rateDeedId = null;
+
+  function starButtons(n, cls) {
+    var out = '';
+    for (var i = 1; i <= 5; i++) {
+      out += '<button type="button" class="star' + (i <= n ? ' on' : '') + '" data-star="' + i + '" aria-label="' + i + ' 星">★</button>';
+    }
+    return '<div class="' + (cls || 'stars') + '" data-kind="deed">' + out + '</div>';
+  }
+
+  function ensureRateMask() {
+    if (rateMask) return rateMask;
+    rateMask = document.createElement('div');
+    rateMask.className = 'rate-mask';
+    rateMask.id = 'rate-mask';
+    rateMask.hidden = true;
+    rateMask.innerHTML =
+      '<div class="rate-dialog" role="dialog" aria-modal="true" aria-label="评分">' +
+        '<h3 id="rate-title"></h3>' +
+        '<p class="rate-hint">打几星？1 星 = 2 分，满分 10 分（只能打一次）</p>' +
+        '<div id="rate-stars" class="rate-stars"></div>' +
+        '<button type="button" class="btn ghost rate-close" id="rate-close">关闭</button>' +
+      '</div>';
+    document.body.appendChild(rateMask);
+    rateMask.addEventListener('click', function (e) {
+      if (e.target === rateMask || e.target.id === 'rate-close') {
+        rateMask.hidden = true;
+        rateDeedId = null;
+      }
+    });
+    return rateMask;
+  }
+
+  function openRateBox(d) {
+    ensureRateMask();
+    rateDeedId = d.id;
+    var mine = 0;
+    try { mine = Number(localStorage.getItem('zj_deed_' + d.id) || 0); } catch (e) {}
+    $('rate-title').textContent = d.body;
+    $('rate-stars').innerHTML = starButtons(mine, 'stars stars-lg');
+    rateMask.hidden = false;
+  }
+
   /* ---------------- 事件 ---------------- */
   document.addEventListener('click', function (e) {
     var t = e.target.closest ? e.target.closest('button') : null;
+
+    // 事迹：点卡片打开评分
+    var card = e.target.closest ? e.target.closest('.deed') : null;
+    if (card && !(t && t.classList.contains('deed-del'))) {
+      var did = card.getAttribute('data-id');
+      var d0 = state.deeds.filter(function (x) { return String(x.id) === String(did); })[0];
+      if (d0) { openRateBox(d0); return; }
+    }
 
     // 名言点赞
     if (t && t.classList.contains('quote-like')) {
@@ -289,16 +344,23 @@
       return;
     }
 
-    // 星级评分
+    // 星级评分（事迹弹窗 / 图片大图）
     if (t && t.classList.contains('star')) {
-      var box = t.closest('.stars');
-      var kind = box.getAttribute('data-kind');
-      var pid = box.getAttribute('data-id');
+      var box = t.closest('.stars') || t.closest('#rate-stars');
+      var inRateBox = !!(t.closest('#rate-stars'));
+      var kind = inRateBox ? 'deed' : (box ? box.getAttribute('data-kind') : '');
+      var pid = inRateBox ? rateDeedId : (box ? box.getAttribute('data-id') : null);
       var n = Number(t.getAttribute('data-star'));
+      if (!pid) return;
       var storeKey = (kind === 'deed' ? 'zj_deed_' : 'zj_photo_') + pid;
       var done = false;
       try { done = !!localStorage.getItem(storeKey); } catch (e) {}
-      if (done) { return; }
+      if (done) { if (inRateBox) { alert('你已经给这件事打过分了'); } return; }
+
+      if (inRateBox) {
+        $('rate-stars').innerHTML = starButtons(n, 'stars stars-lg');
+      }
+
       rpc(kind === 'deed' ? 'rate_deed' : 'rate_photo', { p_id: Number(pid), p_stars: n })
         .then(function (res) {
           try { localStorage.setItem(storeKey, String(n)); } catch (e) {}
@@ -308,6 +370,7 @@
               if (String(d.id) === String(pid)) { d.score_sum = Math.round(obj.avg * obj.count); d.score_count = obj.count; }
             });
             renderDeeds();
+            if (inRateBox) setTimeout(function () { if (rateMask) rateMask.hidden = true; rateDeedId = null; }, 350);
           } else {
             state.photos.forEach(function (p) {
               if (String(p.id) === String(pid)) { p.score_sum = Math.round(obj.avg * obj.count); p.score_count = obj.count; }
@@ -363,6 +426,15 @@
   }
 
   window.addEventListener('zj-admin-change', function () { renderQuotes(); renderDeeds(); });
+
+  // 名言的「查看全部 / 收起」
+  var qMore = $('quote-more');
+  if (qMore) {
+    qMore.addEventListener('click', function () {
+      state.quoteExpanded = !state.quoteExpanded;
+      renderQuotes();
+    });
+  }
 
   loadQuotes();
   loadDeeds();

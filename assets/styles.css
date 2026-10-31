@@ -1228,3 +1228,75 @@ li { list-style: none; }
   .gallery-grid { grid-template-columns: 1fr; }
   .deed-foot { gap: 10px; }
 }
+/* ---------- 品牌图标（图片版） ---------- */
+img.brand-mark { object-fit: cover; }
+
+/* ---------- 事迹卡片（分数在右，点开评分） ---------- */
+.deed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, transform .15s ease;
+}
+.deed:hover { border-color: var(--brand); background: rgba(255, 255, 255, .04); }
+.deed:active { transform: scale(.995); }
+.deed-main { min-width: 0; }
+.deed-sub { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+.deed-side {
+  flex: none;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  gap: 0 4px;
+  text-align: right;
+}
+.deed-score-big {
+  font-family: var(--mono);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--brand);
+  letter-spacing: -.02em;
+}
+.deed-score-unit { font-size: 12px; color: var(--muted); }
+.deed-score-who {
+  grid-column: 1 / -1;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+.deed-del { align-self: flex-start; }
+
+/* ---------- 评分弹窗 ---------- */
+.rate-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 3, 5, .85);
+  backdrop-filter: blur(5px);
+}
+.rate-dialog {
+  width: min(420px, 100%);
+  padding: 26px 24px 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: #0c0c10;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .6);
+  text-align: center;
+}
+.rate-dialog h3 { font-size: 1.15rem; margin-bottom: 6px; }
+.rate-hint { font-size: 12.5px; color: var(--muted); margin-bottom: 16px; }
+.rate-stars { margin-bottom: 18px; }
+.stars-lg .star { font-size: 34px; padding: 0 5px; }
+.rate-close { width: 100%; }
+
+@media (max-width: 720px) {
+  .deed { flex-wrap: wrap; }
+  .deed-side { margin-left: auto; }
+  .deed-score-big { font-size: 24px; }
+}
