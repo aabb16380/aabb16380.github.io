@@ -15,7 +15,7 @@
   var H = { apikey: key, Authorization: 'Bearer ' + key };
   var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
 
-  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed' };
+  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed', gallerySort: 'mixed' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -227,7 +227,19 @@
     var sorted = state.photos.slice().sort(function (a, b) {
       var aa = a.score_count ? a.score_sum / a.score_count : 0;
       var bb = b.score_count ? b.score_sum / b.score_count : 0;
-      if (aa !== bb) return bb - aa;
+      if (state.gallerySort === 'time') {
+        return String(b.created_at).localeCompare(String(a.created_at));
+      }
+      if (state.gallerySort === 'score') {
+        if (aa !== bb) return bb - aa;
+        if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
+        return String(b.created_at).localeCompare(String(a.created_at));
+      }
+      // 综合 = 平均分 × 2 + 评分人数
+      var ca = aa * 2 + (a.score_count || 0);
+      var cb = bb * 2 + (b.score_count || 0);
+      if (ca !== cb) return cb - ca;
+      if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
       return String(b.created_at).localeCompare(String(a.created_at));
     });
     state.photoOrder = sorted.map(function (p) { return String(p.id); });
@@ -265,6 +277,16 @@
         '</button>';
       }).join('');
 
+      var sortEl = $('gallery-sort');
+      if (sortEl) {
+        sortEl.innerHTML = [
+          { k: 'mixed', n: '综合' },
+          { k: 'score', n: '按评分' },
+          { k: 'time', n: '按时间' }
+        ].map(function (o) {
+          return '<button type="button" class="sort-chip' + (o.k === state.gallerySort ? ' active' : '') + '" data-sort="' + o.k + '">' + o.n + '</button>';
+        }).join('');
+      }
       var more = $('gallery-more');
       if (more) {
         if (valid.length > LIMIT) {
@@ -428,11 +450,19 @@
       return;
     }
 
-    // 事迹排序
-    if (t && t.classList.contains('sort-chip') && t.parentElement && t.parentElement.id === 'deed-sort') {
-      state.deedSort = t.getAttribute('data-sort');
-      renderDeeds();
-      return;
+    // 事迹 / 图集排序
+    if (t && t.classList.contains('sort-chip') && t.parentElement) {
+      var sid = t.parentElement.id;
+      if (sid === 'deed-sort') {
+        state.deedSort = t.getAttribute('data-sort');
+        renderDeeds();
+        return;
+      }
+      if (sid === 'gallery-sort') {
+        state.gallerySort = t.getAttribute('data-sort');
+        renderGallery();
+        return;
+      }
     }
 
     // 星级评分（事迹弹窗 / 图片大图）
