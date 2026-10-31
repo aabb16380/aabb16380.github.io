@@ -47,44 +47,56 @@
   }
 
   /* ---------------- 点赞 ---------------- */
-  function paintLike(count) {
-    likeCount.textContent = String(count || 0);
-    var liked = false;
-    try { liked = localStorage.getItem(likedKey) === '1'; } catch (e) {}
-    likeBtn.classList.toggle('is-liked', liked);
-    likeBtn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+  function isLiked() {
+    try { return localStorage.getItem(likedKey) === '1'; } catch (e) { return false; }
   }
 
+  function setLiked(v) {
+    try {
+      if (v) localStorage.setItem(likedKey, '1');
+      else localStorage.removeItem(likedKey);
+    } catch (e) {}
+    likeBtn.classList.toggle('is-liked', v);
+    likeBtn.setAttribute('aria-pressed', v ? 'true' : 'false');
+    likeBtn.setAttribute('aria-label', v ? '取消点赞' : '为这篇文章点赞');
+  }
+
+  function setCount(n) {
+    likeCount.textContent = String(Math.max(0, Number(n) || 0));
+  }
+
+  // 从服务器取最新数字，但不动用户本地的「已赞」状态
   function loadLikes() {
     fetch(URL_BASE + '/rest/v1/post_likes?slug=eq.' + encodeURIComponent(slug) + '&select=likes', {
       headers: headers
     })
       .then(function (r) { return r.ok ? r.json() : []; })
-      .then(function (rows) { paintLike(rows && rows[0] ? rows[0].likes : 0); })
-      .catch(function () { paintLike(0); });
+      .then(function (rows) { setCount(rows && rows[0] ? rows[0].likes : 0); })
+      .catch(function () {});
   }
 
   if (likeBtn) {
-    likeBtn.addEventListener('click', function () {
-      var already = false;
-      try { already = localStorage.getItem(likedKey) === '1'; } catch (e) {}
-      var fn = already ? 'decrement_like' : 'increment_like';
+    setLiked(isLiked());          // 先按本地状态点亮
+    loadLikes();
 
+    likeBtn.addEventListener('click', function () {
+      var liked = isLiked();
+      var current = parseInt(likeCount.textContent, 10) || 0;
+
+      // 1) 先给反馈：立刻变红 / 变灰，数字立刻 ±1
+      setLiked(!liked);
+      setCount(liked ? current - 1 : current + 1);
+
+      // 2) 再后台同步；失败也保留界面状态（用户要求先不管同步）
       likeBtn.disabled = true;
-      fetch(URL_BASE + '/rest/v1/rpc/' + fn, {
+      fetch(URL_BASE + '/rest/v1/rpc/' + (liked ? 'decrement_like' : 'increment_like'), {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ p_slug: slug })
       })
         .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
-        .then(function (n) {
-          paintLike(typeof n === 'number' ? n : Number(n) || 0);
-          try {
-            if (already) localStorage.removeItem(likedKey);
-            else localStorage.setItem(likedKey, '1');
-          } catch (e) {}
-        })
-        .catch(function () { loadLikes(); })
+        .then(function (n) { setCount(n); })
+        .catch(function () { /* 同步失败不回滚 */ })
         .then(function () { likeBtn.disabled = false; });
     });
   }
