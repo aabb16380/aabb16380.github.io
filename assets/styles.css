@@ -1306,7 +1306,7 @@ img.brand-mark { object-fit: cover; }
 .hero-jump {
   display: inline-flex;
   flex-wrap: wrap;
-  margin-top: 30px;
+  margin-top: 0;
   border: 1px solid rgba(255, 255, 255, .22);
   border-radius: 999px;
   overflow: hidden;
@@ -1330,4 +1330,23 @@ img.brand-mark { object-fit: cover; }
   .header-tools .admin-link { padding: 6px 8px; font-size: 12.5px; }
   .hero-jump { margin-top: 22px; width: 100%; border-radius: 8px; }
   .hero-jump a { flex: 1 1 auto; padding: 11px 12px; font-size: 13px; text-align: center; }
+}
+/* ---------- 「读他的」+ 连排按钮 ---------- */
+.hero-cta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 30px;
+}
+.hero-cta-label {
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .hero-cta { gap: 10px; margin-top: 22px; flex-direction: column; align-items: flex-start; }
+  .hero-cta-label { font-size: 14px; }
 }
