@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>更新日志 | zhoujin.site</title>
+<meta name="description" content="zhoujin.site 的版本更新记录。">
+<link rel="canonical" href="https://zhoujin.site/log.html">
+<meta name="author" content="宙金">
+<meta name="theme-color" content="#050507">
+<link rel="icon" href="assets/favicon.png?v=20261031a4" type="image/png">
+<script>
+window.ZJ_BUILD = '20261031a4';
+window.__ZJ_T = (function () {
+  var m = (location.search || '').match(/[?&]t=([^&]+)/);
+  return m ? '&t=' + encodeURIComponent(m[1]) : '';
+})();
+document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031a4' + window.__ZJ_T + '">');
+document.write('<link rel="stylesheet" href="assets/log.css?v=20261031a4' + window.__ZJ_T + '">');
+</script>
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<header class="site-header" id="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="返回首页">
+      <img class="brand-mark" src="assets/icon.png?v=20261031a4" alt="宙金" width="34" height="34">
+      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v2.8</span></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="index.html#journey">经历</a>
+      <a href="index.html#posts">文章</a>
+      <a href="index.html#quotes">名言</a>
+      <a href="index.html#deeds">事迹</a>
+      <a href="index.html#gallery">图集</a>
+      <a href="log.html" class="is-current">日志</a>
+    </nav>
+
+    <div class="header-tools">
+      <button class="icon-btn nav-toggle" id="nav-toggle" type="button" aria-label="打开菜单" aria-expanded="false" aria-controls="nav">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap log-root">
+    <nav class="crumbs" aria-label="面包屑">
+      <a href="index.html">首页</a><span>/</span><span>日志</span>
+    </nav>
+
+    <header class="log-head">
+      <h1>更新日志</h1>
+      <p class="log-sub">这个站点每一次改动都记在这里。当前版本 <strong id="log-current">v2.8</strong>。</p>
+    </header>
+
+    <ol class="log-list" id="log-list">
+      <li class="log-item">
+        <div class="log-ver">v2.8</div>
+        <div class="log-body">
+          <h2>日志页</h2>
+          <ul>
+            <li>菜单新增「日志」，记录每个版本的改动。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.7</div>
+        <div class="log-body">
+          <h2>经历可编辑 · 综合排序改版</h2>
+          <ul>
+            <li>经历（时间线）改为数据库驱动，管理员可新增、编辑、删除节点。</li>
+            <li>文章综合排序改为：阅读 × 1 + 点赞 × 4 + 评论 × 2。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.6</div>
+        <div class="log-body">
+          <h2>事迹展开</h2>
+          <ul>
+            <li>事迹支持「查看全部」，不再只显示前三条。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.5</div>
+        <div class="log-body">
+          <h2>阅读数自动建档</h2>
+          <ul>
+            <li>新文章第一次被打开时自动写入数据库，无需手动入库即可统计阅读量。</li>
+            <li>构建时检测重复 slug 并报错，避免两篇文章互相覆盖。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.4</div>
+        <div class="log-body">
+          <h2>图集排序</h2>
+          <ul>
+            <li>图集新增「综合 / 按评分 / 按时间」排序，默认综合。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.3</div>
+        <div class="log-body">
+          <h2>阅读数显示修复</h2>
+          <ul>
+            <li>文章接口补上阅读字段；重复访问只读取、不重复计数。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.2</div>
+        <div class="log-body">
+          <h2>骨架屏 · 综合排序</h2>
+          <ul>
+            <li>文章、名言、事迹、图集在加载时显示骨架屏与「加载中…」。</li>
+            <li>文章与事迹新增「综合」排序并设为默认。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.1</div>
+        <div class="log-body">
+          <h2>阅读计数 · 事迹评分排序</h2>
+          <ul>
+            <li>文章新增阅读人数统计，管理员可直接修改。</li>
+            <li>事迹按「评分 × 2 + 人数」综合排序，分数相同看人数。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v2.0</div>
+        <div class="log-body">
+          <h2>正式版</h2>
+          <ul>
+            <li>首页五个板块：经历、文章、名言、事迹、图集。</li>
+            <li>点赞改为大拇指，可取消；点击即时反馈。</li>
+            <li>评论免审核、发即显示，失败有明确原因。</li>
+            <li>管理员可增删文章、名言、事迹、图片，并可删除评论。</li>
+            <li>图集支持上传、评分、大图浏览与左右翻页。</li>
+            <li>修复 iPhone 上大图无法显示的问题；新增测试入口与版本号显示。</li>
+          </ul>
+        </div>
+      </li>
+      <li class="log-item">
+        <div class="log-ver">v1.0</div>
+        <div class="log-body">
+          <h2>首次上线</h2>
+          <ul>
+            <li>zhoujin.site 绑定 GitHub Pages，签发 HTTPS 证书。</li>
+            <li>深色星空首页：首屏、文章、经历三块。</li>
+            <li>文章支持分类筛选、按时间与点赞排序。</li>
+            <li>文章数据托管在 Supabase，静态版本作兜底。</li>
+          </ul>
+        </div>
+      </li>
+    </ol>
+
+    <p class="back-home"><a href="index.html">← 返回首页</a></p>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p>© <span id="year">2026</span> zhoujin.site · 关于天才的档案</p>
+    <p class="footer-meta">由 GitHub Pages 托管 · <a href="https://zhoujin.site/">zhoujin.site</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var y = document.getElementById('year');
+  if (y) y.textContent = new Date().getFullYear();
+  var t = document.getElementById('nav-toggle');
+  var nav = document.getElementById('nav');
+  if (t && nav) {
+    t.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+})();
+</script>
+</body>
+</html>

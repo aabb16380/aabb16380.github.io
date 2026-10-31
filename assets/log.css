@@ -1,0 +1,71 @@
+/* ============================================================
+   日志页
+   ============================================================ */
+.log-root {
+  padding-top: calc(var(--header-h) + 40px);
+  padding-bottom: 80px;
+}
+
+.log-head { margin: 18px 0 34px; }
+.log-head h1 {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.15;
+}
+.log-sub {
+  margin-top: 10px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.log-sub strong { color: var(--brand); font-family: var(--mono); }
+
+.log-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.log-item {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.log-ver {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .06em;
+  color: var(--brand);
+  padding-top: 3px;
+}
+
+.log-body h2 {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+
+.log-body ul {
+  display: grid;
+  gap: 6px;
+  padding-left: 1.1em;
+  list-style: disc;
+}
+.log-body li {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.log-body li::marker { color: var(--brand); }
+
+.log-root .back-home { margin-top: 34px; font-size: 14px; }
+.log-root .back-home a { color: var(--muted); }
+.log-root .back-home a:hover { color: var(--brand); }
+
+@media (max-width: 720px) {
+  .log-root { padding-top: calc(var(--header-h) + 24px); }
+  .log-item { grid-template-columns: 1fr; gap: 8px; }
+  .log-ver { padding-top: 0; }
+}
