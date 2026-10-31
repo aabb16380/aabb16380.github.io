@@ -20,8 +20,9 @@
 
   var posts = [];
   var likes = {};
+  var views = {};
   var active = 'all';
-  var sortMode = 'time';
+  var sortMode = 'mixed';   // 综合（默认）
   var expanded = false;
 
   var filterEl = document.getElementById('cat-filter');
@@ -45,6 +46,7 @@
   }
 
   function likeOf(slug) { return Number(likes[slug] || 0); }
+  function viewsOf(slug) { return Number(views[slug] || 0); }
 
   function loadLikes() {
     if (!base || !key) return Promise.resolve();
@@ -55,7 +57,17 @@
       .then(function (rows) {
         (rows || []).forEach(function (r) { likes[r.slug] = r.likes; });
       })
-      .catch(function () {});
+      .catch(function () {})
+      .then(function () {
+        return fetch(base + '/rest/v1/posts?select=slug,views', {
+          headers: { apikey: key, Authorization: 'Bearer ' + key }
+        })
+          .then(function (r) { return r.ok ? r.json() : []; })
+          .then(function (rows) {
+            (rows || []).forEach(function (r) { views[r.slug] = r.views; });
+          })
+          .catch(function () {});
+      });
   }
 
   function sortPosts(items) {
@@ -63,6 +75,12 @@
       if (sortMode === 'likes') {
         var la = likeOf(a.slug), lb = likeOf(b.slug);
         if (la !== lb) return lb - la;
+      }
+      if (sortMode === 'mixed') {
+        // 综合 = 点赞 × 2 + 阅读
+        var ma = likeOf(a.slug) * 2 + viewsOf(a.slug);
+        var mb = likeOf(b.slug) * 2 + viewsOf(b.slug);
+        if (ma !== mb) return mb - ma;
       }
       if (a.date !== b.date) return String(a.date) < String(b.date) ? 1 : -1;
       var ao = Number(a.sort_order == null ? 999 : a.sort_order);
@@ -84,6 +102,7 @@
   function renderSort() {
     if (!sortEl) return;
     var opts = [
+      { key: 'mixed', name: '综合' },
       { key: 'time', name: '按时间' },
       { key: 'likes', name: '按点赞' }
     ];
@@ -109,6 +128,7 @@
             '<span class="post-cat">' + esc(c.name) + '</span>' +
             '<span class="post-meta-right">' +
               (n > 0 ? '<span class="post-likes">👍 ' + n + '</span>' : '') +
+              (viewsOf(p.slug) > 0 ? '<span class="post-views">阅读 ' + viewsOf(p.slug) + '</span>' : '') +
               '<time class="post-date">' + esc(fmtDate(p.date)) + '</time>' +
             '</span>' +
           '</div>' +
@@ -142,7 +162,7 @@
     if (descEl) {
       var c = catMap[active];
       descEl.textContent = active === 'all'
-        ? (sortMode === 'likes' ? '按点赞量排序，点开任意一篇即可留言。' : '按时间倒序排列，点开任意一篇即可留言。')
+        ? (sortMode === 'mixed' ? '按点赞与阅读量综合排序，点开任意一篇即可留言。' : (sortMode === 'likes' ? '按点赞量排序，点开任意一篇即可留言。' : '按时间倒序排列，点开任意一篇即可留言。'))
         : (c ? c.desc : '');
     }
   }

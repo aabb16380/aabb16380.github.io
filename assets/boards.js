@@ -15,7 +15,7 @@
   var H = { apikey: key, Authorization: 'Bearer ' + key };
   var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
 
-  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'time' };
+  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -147,6 +147,12 @@
     }
     var rows = state.deeds.slice().sort(function (a, b) {
       if (state.deedSort === 'score') {
+        var aa = a.score_count ? a.score_sum / a.score_count : 0;
+        var bb = b.score_count ? b.score_sum / b.score_count : 0;
+        if (aa !== bb) return bb - aa;
+        if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
+      }
+      if (state.deedSort === 'mixed') {
         var ca = composite(a), cb = composite(b);
         if (ca !== cb) return cb - ca;
         if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
@@ -178,6 +184,7 @@
     var sortEl = $('deed-sort');
     if (sortEl) {
       sortEl.innerHTML = [
+        { k: 'mixed', n: '综合' },
         { k: 'time', n: '按时间' },
         { k: 'score', n: '按评分' }
       ].map(function (o) {

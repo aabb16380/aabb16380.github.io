@@ -17,14 +17,14 @@
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="assets/favicon.png?v=20261031x" type="image/png">
+<link rel="icon" href="assets/favicon.png?v=20261031y" type="image/png">
 <script>
-window.ZJ_BUILD = '20261031x';
+window.ZJ_BUILD = '20261031y';
 window.__ZJ_T = (function () {
   var m = (location.search || '').match(/[?&]t=([^&]+)/);
   return m ? '&t=' + encodeURIComponent(m[1]) : '';
 })();
-document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + window.__ZJ_T + '">');
+document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031y' + window.__ZJ_T + '">');
 </script>
 
 <!-- 尽早标记 js，避免动画元素先显示再隐藏 -->
@@ -37,8 +37,8 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
 <header class="site-header" id="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="#top" aria-label="回到顶部">
-      <img class="brand-mark" src="assets/icon.png?v=20261031x" alt="宙金" width="34" height="34">
-      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v2.1</span></span>
+      <img class="brand-mark" src="assets/icon.png?v=20261031y" alt="宙金" width="34" height="34">
+      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v2.2</span></span>
     </a>
 
     <nav class="nav" id="nav" aria-label="主导航">
@@ -161,7 +161,12 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
         <span class="post-count" id="post-count"></span>
       </div>
 
-      <div class="post-list" id="post-list"></div>
+      <div class="post-list" id="post-list">
+        <div class="sk-card"><div class="skeleton sk-line w40"></div><div class="skeleton sk-line w70"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line w30"></div></div>
+        <div class="sk-card"><div class="skeleton sk-line w40"></div><div class="skeleton sk-line w60"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line w30"></div></div>
+        <div class="sk-card"><div class="skeleton sk-line w40"></div><div class="skeleton sk-line w70"></div><div class="skeleton sk-line w50"></div></div>
+        <p class="loading-note">加载中…</p>
+      </div>
       <p class="post-empty" id="post-empty" hidden>这一栏还没有文章。</p>
       <button class="more-btn" id="more-btn" type="button" hidden></button>
     </div>
@@ -175,7 +180,12 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
         <h2>名言</h2>
         <p class="section-sub">宙金曰。点一下可以点赞。</p>
       </header>
-      <ol class="quote-list" id="quote-list"></ol>
+      <ol class="quote-list" id="quote-list">
+        <li class="quote sk-quote"><span class="skeleton sk-dot"></span><span class="skeleton sk-line"></span></li>
+        <li class="quote sk-quote"><span class="skeleton sk-dot"></span><span class="skeleton sk-line w70"></span></li>
+        <li class="quote sk-quote"><span class="skeleton sk-dot"></span><span class="skeleton sk-line w50"></span></li>
+        <p class="loading-note">加载中…</p>
+      </ol>
       <p class="quote-empty" id="quote-empty" hidden>还没有名言。</p>
       <button class="more-btn" id="quote-more" type="button" hidden></button>
     </div>
@@ -192,7 +202,12 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
       <div class="deed-head">
         <div class="sort-bar" id="deed-sort" role="group" aria-label="事迹排序"></div>
       </div>
-      <div class="deed-list" id="deed-list"></div>
+      <div class="deed-list" id="deed-list">
+        <div class="deed sk-deed"><div class="skeleton sk-line w50"></div><div class="skeleton sk-line w30"></div></div>
+        <div class="deed sk-deed"><div class="skeleton sk-line w60"></div><div class="skeleton sk-line w30"></div></div>
+        <div class="deed sk-deed"><div class="skeleton sk-line w40"></div><div class="skeleton sk-line w30"></div></div>
+        <p class="loading-note">加载中…</p>
+      </div>
       <p class="deed-empty" id="deed-empty" hidden>还没有事迹。</p>
     </div>
   </section>
@@ -205,7 +220,12 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
         <h2>图集</h2>
         <p class="section-sub">按评分取前三。点开看大图，也可以上传自己的。</p>
       </header>
-      <div class="gallery-grid" id="gallery-grid"></div>
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="skeleton sk-shot"></div>
+        <div class="skeleton sk-shot"></div>
+        <div class="skeleton sk-shot"></div>
+        <p class="loading-note">加载中…</p>
+      </div>
       <button class="more-btn" id="gallery-more" type="button" hidden></button>
       <p class="gallery-empty" id="gallery-empty" hidden>还没有图片，来传第一张。</p>
       <div class="gallery-actions">
@@ -253,7 +273,7 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031x' + wi
     ['assets/main.js', true]
   ];
   for (var i = 0; i < list.length; i++) {
-    document.write('<script src="' + list[i][0] + '?v=20261031x' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
+    document.write('<script src="' + list[i][0] + '?v=20261031y' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
   }
 })();
 </script>

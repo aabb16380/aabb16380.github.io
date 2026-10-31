@@ -1512,3 +1512,49 @@ img.brand-mark { object-fit: cover; }
 }
 body.admin-mode .view-count { cursor: pointer; border-bottom-color: var(--line-strong); }
 body.admin-mode .view-count:hover { color: var(--brand); border-bottom-color: var(--brand); }
+/* ---------- 加载占位（骨架屏） ---------- */
+.skeleton {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(90deg,
+    rgba(255, 255, 255, .045) 0%,
+    rgba(255, 255, 255, .11) 50%,
+    rgba(255, 255, 255, .045) 100%);
+  background-size: 220% 100%;
+  animation: sk-shine 1.25s ease-in-out infinite;
+}
+@keyframes sk-shine {
+  0%   { background-position: 180% 0; }
+  100% { background-position: -80% 0; }
+}
+.sk-card {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+}
+.sk-line { height: 11px; margin-top: 10px; }
+.sk-line:first-child { margin-top: 0; }
+.w30 { width: 30%; } .w40 { width: 40%; } .w50 { width: 50%; }
+.w60 { width: 60%; } .w70 { width: 70%; }
+.sk-dot { width: 14px; height: 14px; border-radius: 50%; margin-top: 6px; }
+.sk-quote { grid-template-columns: 34px minmax(0, 1fr); align-items: center; }
+.sk-deed { display: block; margin-bottom: 12px; }
+.sk-shot { width: 100%; aspect-ratio: 4 / 3; border: 1px solid var(--line); }
+.loading-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  opacity: .7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+/* ---------- 列表里的阅读数 ---------- */
+.post-views {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  opacity: .8;
+}
