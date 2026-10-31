@@ -1,0 +1,370 @@
+/* ============================================================
+   名言 / 事迹 / 图集
+   · 名言：管理员可增删，任何人可点赞
+   · 事迹：管理员可增删，任何人 1–5 星评分
+   · 图集：任何人可上传、可评分，按评分取前三
+   ============================================================ */
+(function () {
+  'use strict';
+
+  var cfg = (window.ZJ_CONFIG && window.ZJ_CONFIG.comments) || {};
+  var base = (cfg.supabaseUrl || '').replace(/\/+$/, '');
+  var key = cfg.supabaseAnonKey || '';
+  if (!base || !key) return;
+
+  var H = { apikey: key, Authorization: 'Bearer ' + key };
+  var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
+
+  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, deedSort: 'time' };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function isAdmin() { return !!(window.ZJ_ADMIN && window.ZJ_ADMIN.active); }
+  function adminToken() { return (window.ZJ_ADMIN && window.ZJ_ADMIN.token) || null; }
+
+  function rpc(name, payload) {
+    return fetch(base + '/rest/v1/rpc/' + name, {
+      method: 'POST', headers: HJ, body: JSON.stringify(payload || {})
+    }).then(function (r) {
+      if (!r.ok) return r.text().then(function (t) { throw new Error(t || ('HTTP ' + r.status)); });
+      return r.text().then(function (t) { return t ? JSON.parse(t) : true; });
+    });
+  }
+
+  function get(table, query) {
+    return fetch(base + '/rest/v1/' + table + '?' + query, { headers: H })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .catch(function () { return []; });
+  }
+
+  /* ---------------- 名言 ---------------- */
+  function likedKey(id) { return 'zj_q_like_' + id; }
+  function isLiked(id) { try { return localStorage.getItem(likedKey(id)) === '1'; } catch (e) { return false; } }
+  function setLiked(id, v) {
+    try { v ? localStorage.setItem(likedKey(id), '1') : localStorage.removeItem(likedKey(id)); } catch (e) {}
+  }
+
+  function renderQuotes() {
+    var list = $('quote-list');
+    if (!list) return;
+    var rows = state.quotes;
+    var visible = state.quoteExpanded ? rows : rows.slice(0, 3);
+
+    list.innerHTML = visible.map(function (q, i) {
+      var n = Number(state.quoteLikes['quote:' + q.id] || 0);
+      var on = isLiked(q.id);
+      return '<li class="quote">' +
+        '<span class="quote-num">' + (i + 1) + '.</span>' +
+        '<span class="quote-body">宙金曰：「' + esc(q.body) + '」</span>' +
+        '<button class="quote-like' + (on ? ' is-liked' : '') + '" data-id="' + q.id + '" type="button" aria-pressed="' + on + '">' +
+          '<span class="ql-icon">👍</span><span class="ql-num">' + n + '</span>' +
+        '</button>' +
+        (isAdmin() ? '<button class="quote-del" data-id="' + q.id + '" type="button" title="删除">×</button>' : '') +
+      '</li>';
+    }).join('');
+
+    var empty = $('quote-empty');
+    if (empty) empty.hidden = rows.length > 0;
+
+    var more = $('quote-more');
+    if (more) {
+      if (rows.length > 3) {
+        more.hidden = false;
+        more.textContent = state.quoteExpanded ? '收起 ↑' : '查看全部 ' + rows.length + ' 条 ↓';
+      } else {
+        more.hidden = true;
+      }
+    }
+
+    var adminRow = $('quote-admin');
+    if (!adminRow && isAdmin()) {
+      adminRow = document.createElement('div');
+      adminRow.id = 'quote-admin';
+      adminRow.className = 'admin-row';
+      adminRow.innerHTML = '<button type="button" class="admin-btn">＋ 新增名言</button>';
+      adminRow.querySelector('button').addEventListener('click', addQuote);
+      $('quotes').querySelector('.wrap').appendChild(adminRow);
+    }
+    if (adminRow) adminRow.hidden = !isAdmin();
+  }
+
+  function addQuote() {
+    var txt = window.prompt('新增一句名言（不用加引号和「宙金曰：」）');
+    if (!txt || !txt.trim()) return;
+    rpc('admin_add_quote', { p_token: adminToken(), p_body: txt.trim() })
+      .then(loadQuotes)
+      .catch(function (e) { alert('添加失败：' + e.message); });
+  }
+
+  function loadQuotes() {
+    return get('quotes', 'select=id,body,sort_order&order=sort_order.asc,id.asc')
+      .then(function (rows) {
+        state.quotes = rows || [];
+        return get('post_likes', 'select=slug,likes&slug=like.quote:*');
+      })
+      .then(function (rows) {
+        state.quoteLikes = {};
+        (rows || []).forEach(function (r) { state.quoteLikes[r.slug] = r.likes; });
+        renderQuotes();
+      });
+  }
+
+  /* ---------------- 事迹 ---------------- */
+  function avg(scoreSum, scoreCount) {
+    if (!scoreCount) return null;
+    return Math.round((scoreSum / scoreCount) * 10) / 10;
+  }
+
+  function starsHtml(id, stars, kind) {
+    var out = '<div class="stars" data-kind="' + kind + '" data-id="' + id + '">';
+    for (var i = 1; i <= 5; i++) {
+      out += '<button type="button" class="star' + (i <= stars ? ' on' : '') + '" data-star="' + i + '" aria-label="' + i + ' 星">★</button>';
+    }
+    return out + '</div>';
+  }
+
+  function renderDeeds() {
+    var list = $('deed-list');
+    if (!list) return;
+
+    var rows = state.deeds.slice().sort(function (a, b) {
+      if (state.deedSort === 'score') {
+        var aa = a.score_count ? a.score_sum / a.score_count : 0;
+        var bb = b.score_count ? b.score_sum / b.score_count : 0;
+        if (aa !== bb) return bb - aa;
+      }
+      return String(b.created_at).localeCompare(String(a.created_at));
+    }).slice(0, 3);
+
+    list.innerHTML = rows.map(function (d) {
+      var a = avg(d.score_sum, d.score_count);
+      var mine = 0;
+      try { mine = Number(localStorage.getItem('zj_deed_' + d.id) || 0); } catch (e) {}
+      return '<article class="deed">' +
+        '<p class="deed-body">' + esc(d.body) + '</p>' +
+        '<div class="deed-foot">' +
+          starsHtml(d.id, mine, 'deed') +
+          '<span class="deed-score">' +
+            (a === null ? '未评分' : a.toFixed(1) + ' 分 · ' + d.score_count + ' 人') +
+          '</span>' +
+          (isAdmin() ? '<button class="deed-del admin-btn" data-id="' + d.id + '" type="button">删除</button>' : '') +
+        '</div>' +
+      '</article>';
+    }).join('');
+
+    var empty = $('deed-empty');
+    if (empty) empty.hidden = state.deeds.length > 0;
+
+    var sortEl = $('deed-sort');
+    if (sortEl) {
+      sortEl.innerHTML = [
+        { k: 'time', n: '按时间' },
+        { k: 'score', n: '按评分' }
+      ].map(function (o) {
+        return '<button type="button" class="sort-chip' + (o.k === state.deedSort ? ' active' : '') + '" data-sort="' + o.k + '">' + o.n + '</button>';
+      }).join('');
+    }
+
+    var adminRow = $('deed-admin');
+    if (!adminRow && isAdmin()) {
+      adminRow = document.createElement('div');
+      adminRow.id = 'deed-admin';
+      adminRow.className = 'admin-row';
+      adminRow.innerHTML = '<button type="button" class="admin-btn">＋ 新增事迹</button>';
+      adminRow.querySelector('button').addEventListener('click', addDeed);
+      $('deeds').querySelector('.wrap').appendChild(adminRow);
+    }
+    if (adminRow) adminRow.hidden = !isAdmin();
+  }
+
+  function addDeed() {
+    var txt = window.prompt('新增一条事迹');
+    if (!txt || !txt.trim()) return;
+    rpc('admin_add_deed', { p_token: adminToken(), p_body: txt.trim() })
+      .then(loadDeeds)
+      .catch(function (e) { alert('添加失败：' + e.message); });
+  }
+
+  function loadDeeds() {
+    return get('deeds', 'select=id,body,created_at,score_sum,score_count&order=created_at.desc')
+      .then(function (rows) { state.deeds = rows || []; renderDeeds(); });
+  }
+
+  /* ---------------- 图集 ---------------- */
+  function publicUrl(path) { return base + '/storage/v1/object/public/' + path; }
+
+  function renderGallery() {
+    var grid = $('gallery-grid');
+    if (!grid) return;
+
+    var rows = state.photos.slice().sort(function (a, b) {
+      var aa = a.score_count ? a.score_sum / a.score_count : 0;
+      var bb = b.score_count ? b.score_sum / b.score_count : 0;
+      if (aa !== bb) return bb - aa;
+      return String(b.created_at).localeCompare(String(a.created_at));
+    }).slice(0, 3);
+
+    grid.innerHTML = rows.map(function (p) {
+      var a = avg(p.score_sum, p.score_count);
+      return '<button type="button" class="shot" data-id="' + p.id + '">' +
+        '<img src="' + esc(p.url) + '" alt="' + esc(p.caption || '图片') + '" loading="lazy">' +
+        '<span class="shot-meta">' + (a === null ? '5.0 分 · 0 人' : a.toFixed(1) + ' 分 · ' + p.score_count + ' 人') + '</span>' +
+      '</button>';
+    }).join('');
+
+    var empty = $('gallery-empty');
+    if (empty) empty.hidden = state.photos.length > 0;
+  }
+
+  function loadGallery() {
+    return get('photos', 'select=id,url,caption,created_at,score_sum,score_count&order=created_at.desc')
+      .then(function (rows) { state.photos = rows || []; renderGallery(); });
+  }
+
+  var lightbox = $('lightbox');
+  var lbImg = $('lightbox-img');
+  var lbCap = $('lightbox-caption');
+  var lbStars = $('lightbox-stars');
+  var lbMeta = $('lightbox-meta');
+  var currentPhoto = null;
+
+  function openPhoto(id) {
+    var p = state.photos.filter(function (x) { return String(x.id) === String(id); })[0];
+    if (!p) return;
+    currentPhoto = p;
+    lbImg.src = p.url;
+    lbCap.textContent = p.caption || '';
+    var a = avg(p.score_sum, p.score_count);
+    lbMeta.textContent = (a === null ? '默认 5.0 分' : a.toFixed(1) + ' 分') +
+      ' · ' + p.score_count + ' 人评分（满分 10，默认 5）';
+    var mine = 0;
+    try { mine = Number(localStorage.getItem('zj_photo_' + p.id) || 0); } catch (e) {}
+    lbStars.innerHTML = starsHtml(p.id, mine, 'photo').replace(/^<div[^>]*>|<\/div>$/g, '');
+    lightbox.hidden = false;
+  }
+
+  function closePhoto() { lightbox.hidden = true; currentPhoto = null; }
+
+  /* ---------------- 事件 ---------------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target.closest('button') : null;
+
+    // 名言点赞
+    if (t && t.classList.contains('quote-like')) {
+      var id = t.getAttribute('data-id');
+      var on = isLiked(id);
+      var cur = Number(state.quoteLikes['quote:' + id] || 0);
+      var next = on ? cur - 1 : cur + 1;
+      state.quoteLikes['quote:' + id] = Math.max(0, next);
+      setLiked(id, !on);
+      renderQuotes();
+      rpc(on ? 'decrement_like' : 'increment_like', { p_slug: 'quote:' + id }).catch(function () {});
+      return;
+    }
+
+    // 名言 / 事迹删除
+    if (t && t.classList.contains('quote-del')) {
+      if (window.confirm('删除这句？')) {
+        rpc('admin_delete_quote', { p_token: adminToken(), p_id: Number(t.getAttribute('data-id')) })
+          .then(loadQuotes).catch(function (e) { alert('删除失败：' + e.message); });
+      }
+      return;
+    }
+    if (t && t.classList.contains('deed-del')) {
+      if (window.confirm('删除这条事迹？')) {
+        rpc('admin_delete_deed', { p_token: adminToken(), p_id: Number(t.getAttribute('data-id')) })
+          .then(loadDeeds).catch(function (e) { alert('删除失败：' + e.message); });
+      }
+      return;
+    }
+
+    // 事迹排序
+    if (t && t.classList.contains('sort-chip') && t.parentElement && t.parentElement.id === 'deed-sort') {
+      state.deedSort = t.getAttribute('data-sort');
+      renderDeeds();
+      return;
+    }
+
+    // 星级评分
+    if (t && t.classList.contains('star')) {
+      var box = t.closest('.stars');
+      var kind = box.getAttribute('data-kind');
+      var pid = box.getAttribute('data-id');
+      var n = Number(t.getAttribute('data-star'));
+      var storeKey = (kind === 'deed' ? 'zj_deed_' : 'zj_photo_') + pid;
+      var done = false;
+      try { done = !!localStorage.getItem(storeKey); } catch (e) {}
+      if (done) { return; }
+      rpc(kind === 'deed' ? 'rate_deed' : 'rate_photo', { p_id: Number(pid), p_stars: n })
+        .then(function (res) {
+          try { localStorage.setItem(storeKey, String(n)); } catch (e) {}
+          var obj = typeof res === 'string' ? JSON.parse(res) : res;
+          if (kind === 'deed') {
+            state.deeds.forEach(function (d) {
+              if (String(d.id) === String(pid)) { d.score_sum = Math.round(obj.avg * obj.count); d.score_count = obj.count; }
+            });
+            renderDeeds();
+          } else {
+            state.photos.forEach(function (p) {
+              if (String(p.id) === String(pid)) { p.score_sum = Math.round(obj.avg * obj.count); p.score_count = obj.count; }
+            });
+            renderGallery();
+            if (currentPhoto && String(currentPhoto.id) === String(pid)) openPhoto(pid);
+          }
+        })
+        .catch(function (e) { alert('评分失败：' + e.message); });
+      return;
+    }
+
+    // 打开大图
+    if (t && t.classList.contains('shot')) { openPhoto(t.getAttribute('data-id')); return; }
+
+    if (t && (t.id === 'lightbox-close' || t.classList.contains('lightbox'))) closePhoto();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && lightbox && !lightbox.hidden) closePhoto();
+  });
+
+  // 上传
+  var fileInput = $('gallery-file');
+  if (fileInput) {
+    fileInput.addEventListener('change', function () {
+      var f = fileInput.files && fileInput.files[0];
+      if (!f) return;
+      if (!/^image\//.test(f.type)) { alert('只能上传图片'); return; }
+      if (f.size > 5 * 1024 * 1024) { alert('图片不能超过 5 MB'); return; }
+
+      var statusEl = $('gallery-status');
+      if (statusEl) statusEl.textContent = '上传中…';
+      var ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '');
+      var path = 'gallery/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+
+      fetch(base + '/storage/v1/object/' + path, {
+        method: 'POST',
+        headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': f.type, 'x-upsert': 'false' },
+        body: f
+      })
+        .then(function (r) { if (!r.ok) return r.text().then(function (t) { throw new Error(t); }); return 1; })
+        .then(function () { return rpc('add_photo', { p_url: publicUrl(path), p_caption: '' }); })
+        .then(function () {
+          if (statusEl) statusEl.textContent = '上传成功';
+          fileInput.value = '';
+          return loadGallery();
+        })
+        .catch(function (e) {
+          if (statusEl) statusEl.textContent = '上传失败：' + (e.message || '').slice(0, 60);
+        });
+    });
+  }
+
+  window.addEventListener('zj-admin-change', function () { renderQuotes(); renderDeeds(); });
+
+  loadQuotes();
+  loadDeeds();
+  loadGallery();
+})();

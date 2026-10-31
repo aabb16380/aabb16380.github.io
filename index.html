@@ -17,8 +17,8 @@
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="assets/favicon.svg?v=20261031d" type="image/svg+xml">
-<link rel="stylesheet" href="assets/styles.css?v=20261031d">
+<link rel="icon" href="assets/favicon.svg?v=20261031e" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css?v=20261031e">
 
 <!-- 尽早标记 js，避免动画元素先显示再隐藏 -->
 <script>document.documentElement.classList.add('js');</script>
@@ -34,8 +34,11 @@
     </a>
 
     <nav class="nav" id="nav" aria-label="主导航">
-      <a href="#posts">文章</a>
       <a href="#journey">经历</a>
+      <a href="#posts">文章</a>
+      <a href="#quotes">名言</a>
+      <a href="#deeds">事迹</a>
+      <a href="#gallery">图集</a>
     </nav>
 
     <div class="header-tools">
@@ -65,35 +68,11 @@
     </div>
   </section>
 
-  <!-- ========== 01 文章 ========== -->
-  <section class="section" id="posts">
-    <div class="wrap">
-      <header class="section-head reveal">
-        <span class="section-index">01</span>
-        <h2>文章</h2>
-        <p class="section-sub">四栏文字：列传、自传、咏，以及其他。点开任意一篇即可留言。</p>
-      </header>
-
-      <div class="cat-row">
-        <div class="cat-filter" id="cat-filter" role="group" aria-label="按栏目筛选"></div>
-        <div class="sort-bar" id="sort-bar" role="group" aria-label="排序方式"></div>
-      </div>
-      <div class="cat-bar">
-        <p class="cat-desc" id="cat-desc"></p>
-        <span class="post-count" id="post-count"></span>
-      </div>
-
-      <div class="post-list" id="post-list"></div>
-      <p class="post-empty" id="post-empty" hidden>这一栏还没有文章。</p>
-      <button class="more-btn" id="more-btn" type="button" hidden></button>
-    </div>
-  </section>
-
-  <!-- ========== 02 经历 ========== -->
+  <!-- ========== 01 经历 ========== -->
   <section class="section" id="journey">
     <div class="wrap">
       <header class="section-head reveal">
-        <span class="section-index">02</span>
+        <span class="section-index">01</span>
         <h2>经历</h2>
       </header>
       <ol class="timeline">
@@ -149,6 +128,89 @@
       </ol>
     </div>
   </section>
+  <!-- ========== 02 文章 ========== -->
+  <section class="section" id="posts">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <span class="section-index">02</span>
+        <h2>文章</h2>
+        <p class="section-sub">四栏文字：列传、自传、咏，以及其他。点开任意一篇即可留言。</p>
+      </header>
+
+      <div class="cat-row">
+        <div class="cat-filter" id="cat-filter" role="group" aria-label="按栏目筛选"></div>
+        <div class="sort-bar" id="sort-bar" role="group" aria-label="排序方式"></div>
+      </div>
+      <div class="cat-bar">
+        <p class="cat-desc" id="cat-desc"></p>
+        <span class="post-count" id="post-count"></span>
+      </div>
+
+      <div class="post-list" id="post-list"></div>
+      <p class="post-empty" id="post-empty" hidden>这一栏还没有文章。</p>
+      <button class="more-btn" id="more-btn" type="button" hidden></button>
+    </div>
+  </section>
+
+  <!-- ========== 03 名言 ========== -->
+  <section class="section section-alt" id="quotes">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <span class="section-index">03</span>
+        <h2>名言</h2>
+        <p class="section-sub">宙金曰。点一下可以点赞。</p>
+      </header>
+      <ol class="quote-list" id="quote-list"></ol>
+      <p class="quote-empty" id="quote-empty" hidden>还没有名言。</p>
+      <button class="more-btn" id="quote-more" type="button" hidden></button>
+    </div>
+  </section>
+
+  <!-- ========== 04 事迹 ========== -->
+  <section class="section" id="deeds">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <span class="section-index">04</span>
+        <h2>事迹</h2>
+        <p class="section-sub">每件事都能打分：1–5 星，一星 2 分。</p>
+      </header>
+      <div class="deed-head">
+        <div class="sort-bar" id="deed-sort" role="group" aria-label="事迹排序"></div>
+      </div>
+      <div class="deed-list" id="deed-list"></div>
+      <p class="deed-empty" id="deed-empty" hidden>还没有事迹。</p>
+    </div>
+  </section>
+
+  <!-- ========== 05 图集 ========== -->
+  <section class="section section-alt" id="gallery">
+    <div class="wrap">
+      <header class="section-head reveal">
+        <span class="section-index">05</span>
+        <h2>图集</h2>
+        <p class="section-sub">按评分取前三。点开看大图，也可以上传自己的。</p>
+      </header>
+      <div class="gallery-grid" id="gallery-grid"></div>
+      <p class="gallery-empty" id="gallery-empty" hidden>还没有图片，来传第一张。</p>
+      <div class="gallery-actions">
+        <label class="btn ghost gallery-upload">
+          上传图片
+          <input type="file" id="gallery-file" accept="image/*" hidden>
+        </label>
+        <span class="gallery-status" id="gallery-status"></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lightbox-inner">
+      <button class="lightbox-close" id="lightbox-close" type="button" aria-label="关闭">×</button>
+      <img id="lightbox-img" alt="">
+      <p class="lightbox-caption" id="lightbox-caption"></p>
+      <div class="stars" id="lightbox-stars"></div>
+      <p class="lightbox-meta" id="lightbox-meta"></p>
+    </div>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -158,11 +220,12 @@
   </div>
 </footer>
 
-<script src="assets/site-config.js?v=20261031d"></script>
-<script src="assets/posts.js?v=20261031d"></script>
-<script src="assets/content.js?v=20261031d"></script>
-<script src="assets/admin.js?v=20261031d" defer></script>
-<script src="assets/posts-render.js?v=20261031d" defer></script>
-<script src="assets/main.js?v=20261031d" defer></script>
+<script src="assets/site-config.js?v=20261031e"></script>
+<script src="assets/posts.js?v=20261031e"></script>
+<script src="assets/content.js?v=20261031e"></script>
+<script src="assets/admin.js?v=20261031e" defer></script>
+<script src="assets/boards.js?v=20261031e" defer></script>
+<script src="assets/posts-render.js?v=20261031e" defer></script>
+<script src="assets/main.js?v=20261031e" defer></script>
 </body>
 </html>
