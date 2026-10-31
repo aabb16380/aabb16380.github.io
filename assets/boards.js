@@ -245,6 +245,7 @@
           card.style.display = 'none';
         }
       });
+      if (window.__zjUpdateMore) window.__zjUpdateMore();
     }
 
     Array.prototype.forEach.call(grid.querySelectorAll('img'), function (img) {
@@ -269,17 +270,24 @@
     var empty = $('gallery-empty');
     if (empty) empty.hidden = state.photos.length > 0;
 
-    var more = $('gallery-more');
-    if (more) {
-      if (sorted.length > LIMIT) {
+    // 计数只算「能显示出来」的图片，避免显示 6 张实际只有 5 张
+    function updateMore() {
+      var more = $('gallery-more');
+      if (!more) return;
+      var ok = 0;
+      Array.prototype.forEach.call(grid.querySelectorAll('.shot'), function (c) {
+        if (c.dataset.ok === '1') ok++;
+      });
+      if (ok > LIMIT) {
         more.hidden = false;
-        more.textContent = state.galleryExpanded
-          ? '收起 ↑'
-          : '查看全部 ' + sorted.length + ' 张 ↓';
+        more.textContent = state.galleryExpanded ? '收起 ↑' : '查看全部 ' + ok + ' 张 ↓';
       } else {
         more.hidden = true;
       }
     }
+    window.__zjUpdateMore = updateMore;
+    setTimeout(updateMore, 400);
+    setTimeout(updateMore, 1500);
   }
 
   function loadGallery() {
@@ -544,7 +552,7 @@
     });
   }
 
-  window.addEventListener('zj-admin-change', function () { renderQuotes(); renderDeeds(); });
+  window.addEventListener('zj-admin-change', function () { renderQuotes(); renderDeeds(); renderGallery(); });
 
   // 名言的「查看全部 / 收起」
   var qMore = $('quote-more');

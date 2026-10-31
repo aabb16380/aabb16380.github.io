@@ -1387,7 +1387,7 @@ img.brand-mark { object-fit: cover; }
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(10, 10, 14, .78);
+  background: rgba(255, 59, 48, .88);
   border: 1px solid rgba(255, 255, 255, .28);
   color: #ff6b5c;
   font-size: 15px;
