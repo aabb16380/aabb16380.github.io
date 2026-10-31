@@ -42,8 +42,13 @@
     var d = new Date(iso);
     if (isNaN(d)) return '';
     var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    var offset = -d.getTimezoneOffset();
+    var offsetHours = Math.floor(Math.abs(offset) / 60);
+    var offsetMinutes = Math.abs(offset) % 60;
+    var timezone = 'UTC' + (offset < 0 ? '-' : '+') + offsetHours +
+      (offsetMinutes ? ':' + p(offsetMinutes) : '');
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
-      ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+      ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ' (' + timezone + ')';
   }
 
   /* ---------------- 点赞 ---------------- */
