@@ -68,10 +68,10 @@
     likeBtn.addEventListener('click', function () {
       var already = false;
       try { already = localStorage.getItem(likedKey) === '1'; } catch (e) {}
-      if (already) return;
+      var fn = already ? 'decrement_like' : 'increment_like';
 
       likeBtn.disabled = true;
-      fetch(URL_BASE + '/rest/v1/rpc/increment_like', {
+      fetch(URL_BASE + '/rest/v1/rpc/' + fn, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ p_slug: slug })
@@ -79,7 +79,10 @@
         .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
         .then(function (n) {
           paintLike(typeof n === 'number' ? n : Number(n) || 0);
-          try { localStorage.setItem(likedKey, '1'); } catch (e) {}
+          try {
+            if (already) localStorage.removeItem(likedKey);
+            else localStorage.setItem(likedKey, '1');
+          } catch (e) {}
         })
         .catch(function () { loadLikes(); })
         .then(function () { likeBtn.disabled = false; });

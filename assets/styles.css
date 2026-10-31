@@ -355,11 +355,19 @@ li { list-style: none; }
 /* ============================================================
    文章列表
    ============================================================ */
+.cat-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
 .cat-filter {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 .filter-chip {
   padding: 7px 14px;
@@ -378,6 +386,58 @@ li { list-style: none; }
   color: #0a0a0c;
   background: var(--brand);
   border-color: var(--brand);
+}
+
+.sort-bar {
+  display: flex;
+  gap: 6px;
+  flex: none;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+}
+.sort-chip {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: color .18s ease, background-color .18s ease;
+}
+.sort-chip:hover { color: var(--text); }
+.sort-chip.active {
+  color: #0a0a0c;
+  background: var(--brand);
+}
+
+.more-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: color .18s ease, border-color .18s ease;
+}
+.more-btn:hover { color: var(--brand); border-color: var(--brand); }
+
+.post-meta-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.post-likes {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--brand);
 }
 
 .cat-bar {
@@ -854,19 +914,27 @@ li { list-style: none; }
 .like-btn:hover { color: var(--brand); border-color: var(--brand); }
 .like-btn:active { transform: scale(.97); }
 .like-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.7;
+  stroke-width: 1.6;
   stroke-linejoin: round;
+  stroke-linecap: round;
+  transition: fill .18s ease, stroke .18s ease, transform .18s ease;
 }
+.like-btn:hover svg { transform: translateY(-1px); }
 .like-btn.is-liked {
-  color: var(--brand);
-  border-color: var(--brand);
-  background: var(--brand-soft);
+  color: #ff3b30;
+  border-color: #ff3b30;
+  background: rgba(255, 59, 48, .12);
 }
-.like-btn.is-liked svg { fill: var(--brand); stroke: var(--brand); }
+.like-btn.is-liked svg {
+  fill: #ff3b30;
+  stroke: #ff3b30;
+  transform: translateY(-1px);
+}
+.like-btn.is-liked .like-label { font-weight: 600; }
 .like-btn:disabled { opacity: .6; cursor: default; }
 .like-count {
   font-family: var(--mono);
