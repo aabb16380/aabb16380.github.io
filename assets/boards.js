@@ -245,7 +245,8 @@
       ' · ' + p.score_count + ' 人评分（满分 10，默认 5）';
     var mine = 0;
     try { mine = Number(localStorage.getItem('zj_photo_' + p.id) || 0); } catch (e) {}
-    lbStars.innerHTML = starsHtml(p.id, mine, 'photo').replace(/^<div[^>]*>|<\/div>$/g, '');
+    // 保留带 data-kind / data-id 的外层，否则点击时读不到图片 id
+    lbStars.innerHTML = starsHtml(p.id, mine, 'photo');
     lightbox.hidden = false;
   }
 
