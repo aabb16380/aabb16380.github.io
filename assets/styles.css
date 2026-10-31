@@ -1485,3 +1485,22 @@ img.brand-mark { object-fit: cover; }
 @media (max-width: 720px) {
   .brand-ver { margin-left: 4px; font-size: 9.5px; padding: 0 4px; }
 }
+/* ---------- 版本号：更小、更透明、与左侧文字基线对齐 ---------- */
+.brand-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.brand-ver {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  line-height: 1;
+  letter-spacing: .06em;
+  color: var(--muted);
+  opacity: .5;
+  padding: 1px 4px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 2px;
+  transform: translateY(-1px);
+}
+.brand-ver.is-test { color: var(--brand); border-color: rgba(255, 90, 60, .5); opacity: .85; }
