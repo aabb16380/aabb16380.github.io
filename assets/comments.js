@@ -42,13 +42,8 @@
     var d = new Date(iso);
     if (isNaN(d)) return '';
     var p = function (n) { return (n < 10 ? '0' : '') + n; };
-    var offset = -d.getTimezoneOffset();
-    var offsetHours = Math.floor(Math.abs(offset) / 60);
-    var offsetMinutes = Math.abs(offset) % 60;
-    var timezone = 'UTC' + (offset < 0 ? '-' : '+') + offsetHours +
-      (offsetMinutes ? ':' + p(offsetMinutes) : '');
     return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
-      ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ' (' + timezone + ')';
+      ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
   }
 
   /* ---------------- 点赞 ---------------- */
@@ -145,27 +140,46 @@
       var body = (form.elements.body.value || '').trim();
       var hp = (form.elements.hp.value || '').trim();
 
-      if (hp) return;                                   // 蜜罐：机器人填了就不发
-      if (body.length < 1) { statusEl.textContent = '写点什么再发吧。'; return; }
-      if (Date.now() - openedAt < 2000) { statusEl.textContent = '慢一点，再试一次。'; return; }
+      // 蜜罐：以前是静默丢弃，浏览器自动填充会误伤真人；现在清空后照常提交
+      if (hp) {
+        try { form.elements.hp.value = ''; } catch (err) {}
+      }
 
+      if (body.length < 1) { statusEl.textContent = '写点什么再发吧。'; return; }
+      if (body.length > 800) { statusEl.textContent = '太长了，最多 800 字。'; return; }
+      if (name.length > 20) { statusEl.textContent = '昵称最多 20 个字。'; return; }
+
+      var btn = form.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
       statusEl.textContent = '发送中…';
+
       fetch(URL_BASE + '/rest/v1/post_comments', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ slug: slug, name: name || '匿名', body: body })
       })
         .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          form.reset();
-          statusEl.textContent = cfg.requireApproval === false
-            ? '已发表，刷新即可看到。'
-            : '已提交，作者审核后显示。';
-          if (cfg.requireApproval === false) loadComments();
+          if (r.ok) return null;
+          return r.text().then(function (t) {
+            var msg = '';
+            try { msg = JSON.parse(t).message || ''; } catch (err) { msg = ''; }
+            throw new Error('HTTP ' + r.status + (msg ? '：' + msg : ''));
+          });
         })
-        .catch(function () {
-          statusEl.textContent = '发送失败，稍后再试。';
-        });
+        .then(function () {
+          form.reset();
+          statusEl.textContent = '已发表 ✓';
+          loadComments();
+        })
+        .catch(function (err) {
+          var m = err && err.message ? err.message : '';
+          if (/Failed to fetch|NetworkError|load failed/i.test(m)) {
+            statusEl.textContent = '网络连不上服务器，换个网络（比如手机流量）再试一次。';
+          } else {
+            statusEl.textContent = '发送失败：' + (m || '未知错误');
+          }
+        })
+        .then(function () { if (btn) btn.disabled = false; });
     });
   }
 
