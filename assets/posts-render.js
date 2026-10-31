@@ -1,25 +1,23 @@
 /* ============================================================
-   首页文章列表渲染 · 读 posts.js，按栏目筛选
+   首页文章列表渲染 · 数据来自 content.js（Supabase 或 posts.js）
    ============================================================ */
 (function () {
   'use strict';
 
   var listEl = document.getElementById('post-list');
-  if (!listEl || !window.ZJ_POSTS) return;
+  if (!listEl) return;
 
   var cats = window.ZJ_CATS || [];
   var catMap = {};
   cats.forEach(function (c) { catMap[c.key] = c; });
 
-  var posts = window.ZJ_POSTS.slice().sort(function (a, b) {
-    return String(b.date || '').localeCompare(String(a.date || ''));
-  });
+  var posts = [];
+  var active = 'all';
 
   var filterEl = document.getElementById('cat-filter');
   var descEl = document.getElementById('cat-desc');
   var countEl = document.getElementById('post-count');
   var emptyEl = document.getElementById('post-empty');
-  var active = 'all';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
@@ -86,6 +84,15 @@
     });
   }
 
-  renderFilter();
-  renderList();
+  function boot(data) {
+    posts = (data && data.posts ? data.posts : []).slice();
+    renderFilter();
+    renderList();
+  }
+
+  if (window.ZJLoadPosts) {
+    window.ZJLoadPosts().then(boot);
+  } else {
+    boot({ posts: window.ZJ_POSTS || [] });
+  }
 })();

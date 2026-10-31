@@ -59,13 +59,34 @@
       <div class="prose" id="post-body"></div>
 
       <nav class="post-nav" id="post-nav" aria-label="文章导航"></nav>
-    </article>
 
-    <section class="comments" id="comments">
-      <h2>评论</h2>
-      <p class="comments-note">留言会保存在本站的 GitHub Discussions 里，需要 GitHub 账号登录。</p>
-      <div class="giscus" id="giscus-holder"></div>
-    </section>
+      <section class="engage" id="engage" hidden>
+      <div class="like-row">
+        <button class="like-btn" id="like-btn" type="button" aria-pressed="false" aria-label="为这篇文章点赞">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.7-7.5-9.6A4.4 4.4 0 0 1 12 7.9a4.4 4.4 0 0 1 7.5 3c0 4.9-7.5 9.6-7.5 9.6z"/></svg>
+          <span>赞</span>
+          <span class="like-count" id="like-count">0</span>
+        </button>
+      </div>
+
+      <div class="comments" id="comments">
+        <h2>评论</h2>
+        <p class="comments-note">无需登录，填个昵称就能留言；提交后经作者确认才会显示。</p>
+
+        <div class="comment-list" id="comment-list"></div>
+
+        <form class="comment-form" id="comment-form" novalidate>
+          <input class="cf-name" name="name" type="text" maxlength="20" placeholder="昵称（可留空）" autocomplete="nickname">
+          <textarea class="cf-body" name="body" rows="4" maxlength="800" required placeholder="说点什么…"></textarea>
+          <input class="cf-hp" name="hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="cf-foot">
+            <button class="btn primary" type="submit">发表</button>
+            <p class="comment-status" id="comment-status" role="status"></p>
+          </div>
+        </form>
+      </div>
+      </section>
+    </article>
 
     <p class="back-home"><a href="index.html#posts">← 返回文章列表</a></p>
   </div>
@@ -80,7 +101,10 @@
 
 <script src="assets/site-config.js"></script>
 <script src="assets/posts.js"></script>
+<script src="assets/content.js"></script>
 <script src="assets/main.js" defer></script>
 <script src="assets/article.js" defer></script>
+<script src="assets/admin.js" defer></script>
+<script src="assets/comments.js" defer></script>
 </body>
 </html>

@@ -25,7 +25,7 @@ zhoujin-site/
 │   ├── bg-a2.webp        # 背景图·桌面（NASA 宇宙悬崖，已压暗虚化）
 │   ├── bg-a2-mobile.webp # 背景图·手机竖版裁切
 │   ├── main.js           # 交互：移动端菜单、滚动动画
-│   ├── site-config.js    # 站点配置（评论 giscus 的三个 ID 填这里）
+│   ├── site-config.js    # 站点配置（评论/点赞的 Supabase 地址与 key 填这里）
 │   ├── posts.js          # 自动生成的文章数据 —— 不要手改（见第十六节）
 │   ├── posts-render.js   # 首页文章列表 + 栏目筛选
 │   ├── article.js        # 文章详情渲染 + 挂载评论
@@ -340,49 +340,92 @@ python -m http.server 8000
 `key` 不要改（文章靠它归类），`name` 和 `desc` 随便改。
 若要**增加第五个栏目**，在这里加一项，`key` 用新的英文词，文章里 `cat` 填它即可。
 
-### 13.3 开评论（giscus，免费，无需服务器）
+### 13.3 开评论与点赞（Supabase，读者免登录）
 
-评论存在**你自己仓库的 Discussions** 里，不经过任何第三方数据库，也不用备案。
+读者不用注册、不用登录，填个昵称就能留言；点赞也是点一下就算。
+数据存在你自己的 Supabase 免费数据库里。**配置前置空时，整块区域自动隐藏。**
 
-三步：
+五步，大约 5 分钟：
 
-1. **仓库开 Discussions**：仓库 → Settings → General → Features → 勾选 **Discussions**
-2. **装 giscus App**：打开 <https://github.com/apps/giscus> → Install → 选择这个仓库
-3. **拿三个值**：打开 <https://giscus.app/zh-CN> ，在「仓库」里填 `aabb16380/aabb16380.github.io`，
-   往下选「Discussion 分类」为 `Announcements`，页面会给出一段 `<script>`，里面有：
-   - `data-repo` → 对应 `repo`
-   - `data-repo-id` → 对应 `repoId`
-   - `data-category-id` → 对应 `categoryId`
+1. 打开 <https://supabase.com> → 注册 → **New project**
+   - 区域选 **Southeast Asia (Singapore)**，离国内最近
+2. 项目建好后，左侧 **SQL Editor** → New query → 依次执行两个文件：
+   1. **`supabase/schema.sql`**（建表 + 函数 + 权限）
+   2. **`supabase/seed.sql`**（写入 5 个管理员密钥的哈希 + 现有 8 篇文章）
+3. 左侧 **Project Settings → API**，复制两个值：
+   - **Project URL**（形如 `https://abcdefgh.supabase.co`）
+   - **anon public** 那一长串 key
+4. 填进 `assets/site-config.js`：
 
-把这四个值填进 `assets/site-config.js`：
+   ```js
+   comments: {
+     provider: "supabase",
+     supabaseUrl: "https://abcdefgh.supabase.co",
+     supabaseAnonKey: "eyJhbGciOi...",
+     requireApproval: true
+   }
+   ```
 
-```js
-giscus: {
-  repo: "aabb16380/aabb16380.github.io",
-  repoId: "R_kgDOxxxxxxx",
-  category: "Announcements",
-  categoryId: "DIC_kwDOxxxxxxx",
-  ...
-}
-```
+5. 提交 → 1 分钟后任意文章页底部就有点赞和评论了
 
-保存提交，刷新任意文章页即可看到评论区。
+**审核评论**：Supabase → Table Editor → `post_comments` → 把 `approved` 勾成 `true`，刷新页面即显示。
+想免审核（直接显示），把 `requireApproval` 改成 `false`。
 
-**三个值没填时，评论区整块自动隐藏**，不会在线上留一个空框，可以放心先上线。
+**防刷**：代码里内置了蜜罐字段和"提交过快"拦截，能挡住大部分机器人。
+但匿名评论本质上挡不住恶意刷屏，所以默认开着审核。
 
 ### 13.4 关于评论的几点说明
 
 | 事项 | 说明 |
 |---|---|
-| 读者要登录 | giscus 基于 GitHub，留言必须用 GitHub 账号登录（对技术圈朋友不算门槛，对长辈朋友是） |
-| 仓库必须 Public | 私有仓库的评论对访客不可见 |
-| 你不想要 GitHub 登录 | 换成 Twikoo 或 Waline，但要另外部署一个免费后端（Vercel / LeanCloud），多一层维护 |
-| 有人发垃圾评论 | GitHub Discussions 里有删除/屏蔽按钮，你作为仓库主人可以直接处理 |
-| 邮件通知 | 在 giscus.app 页面可勾选"评论时通知"，之后有人留言会发邮件给你 |
+| 读者要登录吗 | **不用**，填昵称即可；昵称留空显示「匿名」 |
+| 点赞能重复点吗 | 同一个浏览器点了就记住（localStorage），换设备可以再点一次 |
+| 数据在哪 | 你自己的 Supabase 项目，随时可导出、可删除 |
+| 免费额度够吗 | 500 MB 数据库 + 5 万月活认证，个人站远远用不完 |
+| 国内访问 | `*.supabase.co` 在国内能访问，速度一般；图片多时不要走它的 Storage |
+| 有人刷屏 | 去 Supabase Table Editor 删掉，或把 `approved` 取消勾选 |
 
 ---
 
-## 十四、免费方案的边界
+## 十四、管理员模式（网页上发文章）
+
+配好 Supabase 之后，导航栏右上角会出现 **「管理员」**。
+
+### 怎么进
+
+点「管理员」→ 输入密钥（`ZJ-XXXX-XXXX-XXXX`）→ 校验通过后进入管理模式，**24 小时内有效**，
+存在浏览器本地，过期自动失效，点「退出管理」立即注销。
+
+密钥一共 5 个，明文只在本地 `admin-keys.txt`，**数据库里只存 sha256**。
+要作废某个密钥：Supabase → `admin_keys` → 把对应那行的 `enabled` 改成 `false`。
+
+### 能做什么
+
+| 操作 | 位置 |
+|---|---|
+| 发布新文章 | 首页「文章」标题下方的 **＋ 发布新文章** |
+| 编辑文章 | 任意文章页标题下的 **编辑这篇**（链接标识不可改） |
+| 删除文章 | 同上的 **删除**（只删数据库里的，不影响 `content/posts/` 的 md） |
+| 删除评论 | 每条评论右侧的 **删除** |
+
+### 为什么这样做是安全的
+
+- 密钥校验在 **Supabase 的 `admin_login()` 函数里**，前端只提交明文、拿回 token；
+- 所有写操作都会在函数内部校验 token，改前端 JS 绕不过去；
+- `admin_keys` 表开了 RLS 但没建策略，前端根本读不到；
+- token 存在 `admin_sessions`，24 小时过期，可随时删行强制下线。
+
+> ⚠️ 密钥等同于管理员密码：别截图发群、别提交进仓库。泄露就去 `admin_keys` 把 `enabled` 关掉。
+
+### 文章存在哪
+
+管理员发布的文章存在 Supabase 的 `posts` 表；页面加载先读数据库，
+读不到（断网、本地双击打开）就回退到 `assets/posts.js`。
+所以**已有 8 篇 md 仍然有效**，只是被数据库里的同名文章覆盖。
+
+---
+
+## 十五、免费方案的边界
 
 | 项目 | 限制 |
 |---|---|
@@ -392,7 +435,7 @@ giscus: {
 | 发布频率 | 每小时 ≤ 10 次 |
 | 构建 | 纯静态，无构建步骤，秒级发布 |
 
-## 十五、国内访问
+## 十六、国内访问
 
 GitHub Pages 服务器在境外，**绑定自定义域名不需要 ICP 备案**，但国内访问速度不稳定，
 部分地区/运营商可能很慢。如果以后主要面向国内用户：
@@ -402,7 +445,7 @@ GitHub Pages 服务器在境外，**绑定自定义域名不需要 ICP 备案**�
    此时域名要**做 ICP 备案**（约 1–2 周，需国内主体与服务器）；
 3. 备案期间可继续用当前站点，切换只改 DNS，不影响域名所有权。
 
-## 十六、用后台发文章（Pages CMS）
+## 十七、用后台发文章（Pages CMS）
 
 站点是纯静态的，所以「登录 + 发文章」不是传统后台，而是：
 **用 GitHub 账号登录一个可视化编辑器，它替你往仓库提交 Markdown 文件。**
