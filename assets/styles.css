@@ -1468,3 +1468,20 @@ img.brand-mark { object-fit: cover; }
 @media (max-width: 720px) {
   .build-bar { padding: 3px 12px; font-size: 10px; }
 }
+/* ---------- 站点名后面的版本号 ---------- */
+.brand-ver {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .04em;
+  color: var(--muted);
+  line-height: 1.5;
+  vertical-align: middle;
+}
+.brand-ver.is-test { color: var(--brand); border-color: var(--brand); }
+@media (max-width: 720px) {
+  .brand-ver { margin-left: 4px; font-size: 9.5px; padding: 0 4px; }
+}

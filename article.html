@@ -26,22 +26,13 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031v' + wi
 <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
-<div class="build-bar" id="build-bar"><span class="bb-left">BUILD 20261031v</span><span class="bb-right" id="bb-right"></span></div>
-<script>
-(function () {
-  var m = (location.search || '').match(/[?&]t=([^&]+)/);
-  var el = document.getElementById('bb-right');
-  if (el) el.textContent = m ? 'TEST ' + m[1] : 'STABLE';
-})();
-</script>
-
 <a class="skip-link" href="#main">跳到主要内容</a>
 
 <header class="site-header" id="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="index.html" aria-label="返回首页">
       <img class="brand-mark" src="assets/icon.png?v=20261031v" alt="宙金" width="34" height="34">
-      <span class="brand-name">zhoujin.site</span>
+      <span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v1.0</span>
     </a>
 
           <nav class="nav" id="nav" aria-label="主导航">
