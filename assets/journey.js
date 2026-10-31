@@ -62,14 +62,34 @@
     if (addRow) addRow.hidden = !isAdmin();
   }
 
+  var tableReady = false;
+
+  function showNotice() {
+    if (!isAdmin() || tableReady) return;
+    if (document.getElementById('journey-notice')) return;
+    var box = document.createElement('p');
+    box.id = 'journey-notice';
+    box.className = 'journey-notice';
+    box.innerHTML = '经历的编辑功能还没启用：数据库里还没有 <code>journey</code> 表。<br>' +
+      '在 Supabase SQL Editor 里跑一次 <code>supabase/patch-journey-v27.sql</code> 即可（只需一次），' +
+      '跑完刷新本页，每个节点下方就会<br>出现<strong>编辑 / 删除</strong>按钮。';
+    listEl.parentNode.appendChild(box);
+  }
+
   function load() {
     return fetch(base + '/rest/v1/journey?select=id,time_label,title,body,sort_order&order=sort_order.asc,id.asc', { headers: H })
-      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (r) {
+        if (!r.ok) { tableReady = false; showNotice(); return []; }
+        tableReady = true;
+        return r.json();
+      })
       .then(function (rows) {
         items = rows || [];
         if (items.length) render();
+        var n = document.getElementById('journey-notice');
+        if (n && tableReady) n.remove();
       })
-      .catch(function () { /* 表还没建就保留静态版本 */ });
+      .catch(function () { showNotice(); });
   }
 
   function addItem() {
@@ -117,7 +137,7 @@
     else delItem(id);
   });
 
-  window.addEventListener('zj-admin-change', function () { if (items.length) render(); });
+  window.addEventListener('zj-admin-change', function () { if (items.length) render(); else load(); });
 
   load();
 })();

@@ -1569,3 +1569,61 @@ body.admin-mode .view-count:hover { color: var(--brand); border-bottom-color: va
   font-size: 12px;
 }
 .tl-admin .admin-btn.danger { color: #ff6b5c; border-color: rgba(255, 107, 92, .45); }
+/* ---------- 管理员登录：说明区 ---------- */
+.admin-dialog-lg { max-width: 520px; width: min(520px, calc(100vw - 40px)); }
+.admin-intro {
+  margin: 4px 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, .02);
+}
+.admin-intro h4 {
+  font-size: 12.5px;
+  letter-spacing: .08em;
+  color: var(--brand);
+  margin-bottom: 6px;
+}
+.admin-intro h4:not(:first-child) { margin-top: 14px; }
+.admin-intro ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 1.1em;
+  list-style: disc;
+}
+.admin-intro li {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.admin-intro p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.admin-intro strong { color: var(--text); }
+.admin-intro code {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, .06);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* ---------- 经历：未启用提示 ---------- */
+.journey-notice {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(255, 107, 92, .5);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.journey-notice strong { color: #ff6b5c; }
+.journey-notice code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}

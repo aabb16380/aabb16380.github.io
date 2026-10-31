@@ -82,9 +82,22 @@
   function openLogin() {
     var mask = el('div', { class: 'admin-mask', id: 'admin-mask' });
     mask.innerHTML =
-      '<div class="admin-dialog" role="dialog" aria-modal="true" aria-label="管理员登录">' +
+      '<div class="admin-dialog admin-dialog-lg" role="dialog" aria-modal="true" aria-label="管理员登录">' +
         '<h3>管理员登录</h3>' +
         '<p class="admin-hint">输入密钥，校验通过后进入管理模式（24 小时内有效）。</p>' +
+        '<div class="admin-intro">' +
+          '<h4>管理员能做什么</h4>' +
+          '<ul>' +
+            '<li>发布、编辑、删除文章</li>' +
+            '<li>新增／删除名言，并调整内容</li>' +
+            '<li>新增／删除事迹</li>' +
+            '<li>删除图集里的图片、修改文章阅读数</li>' +
+            '<li>编辑经历（时间线）的节点</li>' +
+            '<li>删除任何人的评论</li>' +
+          '</ul>' +
+          '<h4>怎么拿到密钥</h4>' +
+          '<p>本站不开放注册。<strong>找另一位管理员要一个密钥</strong>即可——密钥形如 <code>ZJ-XXXX-XXXX-XXXX</code>，五把互为等价，24 小时内免重复输入。</p>' +
+        '</div>' +
         '<input class="admin-input" id="admin-key-input" type="text" autocomplete="off" spellcheck="false" placeholder="ZJ-XXXX-XXXX-XXXX">' +
         '<p class="admin-error" id="admin-error"></p>' +
         '<div class="admin-actions">' +
