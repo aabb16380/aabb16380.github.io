@@ -48,6 +48,53 @@
     document.title = '没有这篇文章 | zhoujin.site';
   }
 
+  var VCFG = (window.ZJ_CONFIG && window.ZJ_CONFIG.comments) || {};
+  var VURL = (VCFG.supabaseUrl || '').replace(/\/+$/, '');
+  var VKEY = VCFG.supabaseAnonKey || '';
+
+  function paintViews(n) {
+    var el = document.getElementById('view-count');
+    if (el) el.textContent = '阅读 ' + (Number(n) || 0);
+  }
+
+  function countView(post) {
+    if (!VURL || !VKEY) return;
+    var key = 'zj_viewed_' + post.slug;
+    var seen = false;
+    try { seen = sessionStorage.getItem(key) === '1'; } catch (e) {}
+    if (seen) return;
+    try { sessionStorage.setItem(key, '1'); } catch (e) {}
+
+    fetch(VURL + '/rest/v1/rpc/bump_views', {
+      method: 'POST',
+      headers: { apikey: VKEY, Authorization: 'Bearer ' + VKEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_slug: post.slug })
+    })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+      .then(function (n) { paintViews(n); post.views = n; })
+      .catch(function () { /* 没跑补丁时静默 */ });
+  }
+
+  // 管理员点「阅读 N」改数字
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('#view-count') : null;
+    if (!el) return;
+    if (!(window.ZJ_ADMIN && window.ZJ_ADMIN.active)) return;
+    var cur = (el.textContent || '').replace(/[^\d]/g, '');
+    var input = window.prompt('把阅读数改成多少？', cur);
+    if (input === null) return;
+    var n = parseInt(input, 10);
+    if (isNaN(n) || n < 0) { alert('请输入 0 或正整数'); return; }
+    fetch(VURL + '/rest/v1/rpc/admin_set_views', {
+      method: 'POST',
+      headers: { apikey: VKEY, Authorization: 'Bearer ' + VKEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_token: (window.ZJ_ADMIN && window.ZJ_ADMIN.token) || null, p_slug: slug, p_views: n })
+    })
+      .then(function (r) { return r.ok ? r.json() : r.text().then(function (x) { throw new Error(x); }); })
+      .then(function (v) { paintViews(v); })
+      .catch(function (err) { alert('修改失败：' + err.message); });
+  });
+
   function boot(data) {
     var posts = (data && data.posts ? data.posts : []).slice();
     var idx = -1;
@@ -80,8 +127,11 @@
       metaEl.innerHTML = '<time datetime="' + (post.date || '') + '">' + fmtDate(post.date) + '</time>' +
         (post.byline ? '<span class="dot-sep">·</span><span class="byline">' + esc(post.byline) + '</span>' : '') +
         '<span class="dot-sep">·</span><span>约 ' + mins + ' 分钟</span>' +
+        '<span class="dot-sep">·</span><span class="view-count" id="view-count" title="阅读人数">阅读 ' + (post.views || 0) + '</span>' +
         (post.sample ? '<span class="dot-sep">·</span><span class="badge-sample">示例内容</span>' : '');
     }
+
+    countView(post);
 
     if (bodyEl) bodyEl.innerHTML = post.body || '<p class="muted">（正文待补）</p>';
 

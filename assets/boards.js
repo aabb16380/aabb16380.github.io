@@ -140,11 +140,16 @@
     var list = $('deed-list');
     if (!list) return;
 
+    // 综合分 = 平均分 × 2 + 评分人数；分数相同看人数，人数多的在前
+    function composite(d) {
+      var avgScore = d.score_count ? d.score_sum / d.score_count : 0;
+      return avgScore * 2 + (d.score_count || 0);
+    }
     var rows = state.deeds.slice().sort(function (a, b) {
       if (state.deedSort === 'score') {
-        var aa = a.score_count ? a.score_sum / a.score_count : 0;
-        var bb = b.score_count ? b.score_sum / b.score_count : 0;
-        if (aa !== bb) return bb - aa;
+        var ca = composite(a), cb = composite(b);
+        if (ca !== cb) return cb - ca;
+        if ((a.score_count || 0) !== (b.score_count || 0)) return (b.score_count || 0) - (a.score_count || 0);
       }
       return String(b.created_at).localeCompare(String(a.created_at));
     }).slice(0, 3);

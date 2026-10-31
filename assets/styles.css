@@ -1504,3 +1504,11 @@ img.brand-mark { object-fit: cover; }
   transform: translateY(-1px);
 }
 .brand-ver.is-test { color: var(--brand); border-color: rgba(255, 90, 60, .5); opacity: .85; }
+/* ---------- 阅读计数 ---------- */
+.view-count {
+  color: var(--muted);
+  border-bottom: 1px dashed transparent;
+  cursor: default;
+}
+body.admin-mode .view-count { cursor: pointer; border-bottom-color: var(--line-strong); }
+body.admin-mode .view-count:hover { color: var(--brand); border-bottom-color: var(--brand); }
