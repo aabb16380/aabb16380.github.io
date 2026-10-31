@@ -51,7 +51,16 @@
   function renderQuotes() {
     var list = $('quote-list');
     if (!list) return;
-    var rows = state.quotes;
+    // 按点赞量从高到低；点赞相同再按原本的序号
+    var rows = state.quotes.slice().sort(function (a, b) {
+      var la = Number(state.quoteLikes['quote:' + a.id] || 0);
+      var lb = Number(state.quoteLikes['quote:' + b.id] || 0);
+      if (la !== lb) return lb - la;
+      var sa = Number(a.sort_order == null ? 999 : a.sort_order);
+      var sb = Number(b.sort_order == null ? 999 : b.sort_order);
+      if (sa !== sb) return sa - sb;
+      return Number(a.id) - Number(b.id);
+    });
     var visible = state.quoteExpanded ? rows : rows.slice(0, 3);
 
     list.innerHTML = visible.map(function (q, i) {
@@ -212,25 +221,50 @@
     state.photoOrder = sorted.map(function (p) { return String(p.id); });
 
     var LIMIT = 3;
-    var rows = state.galleryExpanded ? sorted : sorted.slice(0, LIMIT);
+    // 多渲染几张做候补：坏图被移除后，后面的自动补上，不占空位
+    var pool = state.galleryExpanded ? sorted : sorted.slice(0, LIMIT + 6);
 
-    grid.innerHTML = rows.map(function (p) {
+    grid.innerHTML = pool.map(function (p) {
       var a = avg(p.score_sum, p.score_count);
-      return '<button type="button" class="shot" data-id="' + p.id + '">' +
+      return '<button type="button" class="shot" data-id="' + p.id + '" style="display:none">' +
         '<img src="' + esc(p.url) + '" alt="' + esc(p.caption || '图片') + '" loading="lazy" data-id="' + p.id + '">' +
         '<span class="shot-meta">' + (a === null ? '5.0 分 · 0 人' : a.toFixed(1) + ' 分 · ' + p.score_count + ' 人') + '</span>' +
         (isAdmin() ? '<span class="shot-del" role="button" data-id="' + p.id + '" title="删除这张">×</span>' : '') +
       '</button>';
     }).join('');
 
-    // 图片解不出来（HEIC 等）就整块移除，不留破图
+    // 只有成功解码的图才占位；坏图（HEIC 等）直接移除并让后面补位
+    var target = state.galleryExpanded ? Infinity : LIMIT;
+    function settle() {
+      var shown = 0;
+      Array.prototype.forEach.call(grid.querySelectorAll('.shot'), function (card) {
+        if (card.dataset.ok === '1' && shown < target) {
+          card.style.display = '';
+          shown++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
     Array.prototype.forEach.call(grid.querySelectorAll('img'), function (img) {
+      img.addEventListener('load', function () {
+        var card = img.closest('.shot');
+        if (card) card.dataset.ok = '1';
+        settle();
+      });
       img.addEventListener('error', function () {
         var card = img.closest('.shot');
         if (card) card.remove();
         if (isAdmin()) { deletePhoto(img.getAttribute('data-id')); }
+        settle();
       });
+      if (img.complete && img.naturalWidth > 0) {
+        var c0 = img.closest('.shot');
+        if (c0) c0.dataset.ok = '1';
+      }
     });
+    settle();
 
     var empty = $('gallery-empty');
     if (empty) empty.hidden = state.photos.length > 0;
@@ -278,6 +312,15 @@
       lbStars.innerHTML = '';
       lbMeta.textContent = '';
     };
+    var delBtn = document.getElementById('lightbox-del');
+    if (delBtn) {
+      delBtn.hidden = !isAdmin();
+      delBtn.onclick = function () {
+        if (!window.confirm('删除这张图片？')) return;
+        deletePhoto(p.id);
+        closePhoto();
+      };
+    }
     lightbox.hidden = false;
   }
 
