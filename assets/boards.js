@@ -15,7 +15,7 @@
   var H = { apikey: key, Authorization: 'Bearer ' + key };
   var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
 
-  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, deedSort: 'time' };
+  var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'time' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -203,12 +203,16 @@
     var grid = $('gallery-grid');
     if (!grid) return;
 
-    var rows = state.photos.slice().sort(function (a, b) {
+    var sorted = state.photos.slice().sort(function (a, b) {
       var aa = a.score_count ? a.score_sum / a.score_count : 0;
       var bb = b.score_count ? b.score_sum / b.score_count : 0;
       if (aa !== bb) return bb - aa;
       return String(b.created_at).localeCompare(String(a.created_at));
-    }).slice(0, 3);
+    });
+    state.photoOrder = sorted.map(function (p) { return String(p.id); });
+
+    var LIMIT = 3;
+    var rows = state.galleryExpanded ? sorted : sorted.slice(0, LIMIT);
 
     grid.innerHTML = rows.map(function (p) {
       var a = avg(p.score_sum, p.score_count);
@@ -220,6 +224,18 @@
 
     var empty = $('gallery-empty');
     if (empty) empty.hidden = state.photos.length > 0;
+
+    var more = $('gallery-more');
+    if (more) {
+      if (sorted.length > LIMIT) {
+        more.hidden = false;
+        more.textContent = state.galleryExpanded
+          ? '收起 ↑'
+          : '查看全部 ' + sorted.length + ' 张 ↓';
+      } else {
+        more.hidden = true;
+      }
+    }
   }
 
   function loadGallery() {
@@ -391,8 +407,32 @@
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && lightbox && !lightbox.hidden) closePhoto();
+    if (!lightbox || lightbox.hidden) return;
+    if (e.key === 'Escape') closePhoto();
+    if (e.key === 'ArrowLeft') stepPhoto(-1);
+    if (e.key === 'ArrowRight') stepPhoto(1);
   });
+
+  function stepPhoto(dir) {
+    if (!currentPhoto || !state.photoOrder.length) return;
+    var i = state.photoOrder.indexOf(String(currentPhoto.id));
+    if (i < 0) return;
+    var n = (i + dir + state.photoOrder.length) % state.photoOrder.length;
+    openPhoto(state.photoOrder[n]);
+  }
+
+  var lbPrev = document.getElementById('lightbox-prev');
+  var lbNext = document.getElementById('lightbox-next');
+  if (lbPrev) lbPrev.addEventListener('click', function () { stepPhoto(-1); });
+  if (lbNext) lbNext.addEventListener('click', function () { stepPhoto(1); });
+
+  var gMore = document.getElementById('gallery-more');
+  if (gMore) {
+    gMore.addEventListener('click', function () {
+      state.galleryExpanded = !state.galleryExpanded;
+      renderGallery();
+    });
+  }
 
   // 上传
   var fileInput = $('gallery-file');
