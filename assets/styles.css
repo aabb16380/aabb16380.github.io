@@ -1377,3 +1377,24 @@ img.brand-mark { object-fit: cover; }
   .lightbox-nav.prev { left: 8px; }
   .lightbox-nav.next { right: 8px; }
 }
+/* ---------- 图集：删除角标 ---------- */
+.shot-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(10, 10, 14, .78);
+  border: 1px solid rgba(255, 255, 255, .28);
+  color: #ff6b5c;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .18s ease, background-color .18s ease;
+}
+.shot:hover .shot-del { opacity: 1; }
+.shot-del:hover { background: rgba(255, 59, 48, .9); color: #fff; }

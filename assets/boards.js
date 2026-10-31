@@ -217,10 +217,20 @@
     grid.innerHTML = rows.map(function (p) {
       var a = avg(p.score_sum, p.score_count);
       return '<button type="button" class="shot" data-id="' + p.id + '">' +
-        '<img src="' + esc(p.url) + '" alt="' + esc(p.caption || '图片') + '" loading="lazy">' +
+        '<img src="' + esc(p.url) + '" alt="' + esc(p.caption || '图片') + '" loading="lazy" data-id="' + p.id + '">' +
         '<span class="shot-meta">' + (a === null ? '5.0 分 · 0 人' : a.toFixed(1) + ' 分 · ' + p.score_count + ' 人') + '</span>' +
+        (isAdmin() ? '<span class="shot-del" role="button" data-id="' + p.id + '" title="删除这张">×</span>' : '') +
       '</button>';
     }).join('');
+
+    // 图片解不出来（HEIC 等）就整块移除，不留破图
+    Array.prototype.forEach.call(grid.querySelectorAll('img'), function (img) {
+      img.addEventListener('error', function () {
+        var card = img.closest('.shot');
+        if (card) card.remove();
+        if (isAdmin()) { deletePhoto(img.getAttribute('data-id')); }
+      });
+    });
 
     var empty = $('gallery-empty');
     if (empty) empty.hidden = state.photos.length > 0;
@@ -263,6 +273,11 @@
     try { mine = Number(localStorage.getItem('zj_photo_' + p.id) || 0); } catch (e) {}
     // 保留带 data-kind / data-id 的外层，否则点击时读不到图片 id
     lbStars.innerHTML = starsHtml(p.id, mine, 'photo');
+    lbImg.onerror = function () {
+      lbCap.textContent = '这张图浏览器显示不了（可能是 HEIC 格式），管理员可以删掉它。';
+      lbStars.innerHTML = '';
+      lbMeta.textContent = '';
+    };
     lightbox.hidden = false;
   }
 
@@ -426,6 +441,20 @@
   if (lbPrev) lbPrev.addEventListener('click', function () { stepPhoto(-1); });
   if (lbNext) lbNext.addEventListener('click', function () { stepPhoto(1); });
 
+  function deletePhoto(id) {
+    if (!id || !isAdmin()) return;
+    rpc('admin_delete_photo', { p_token: adminToken(), p_id: Number(id) })
+      .then(function () { state.photos = state.photos.filter(function (x) { return String(x.id) !== String(id); }); renderGallery(); })
+      .catch(function () {});
+  }
+
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.shot-del') : null;
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm('删除这张图片？')) deletePhoto(b.getAttribute('data-id'));
+  }, true);
   var gMore = document.getElementById('gallery-more');
   if (gMore) {
     gMore.addEventListener('click', function () {
@@ -440,8 +469,14 @@
     fileInput.addEventListener('change', function () {
       var f = fileInput.files && fileInput.files[0];
       if (!f) return;
-      if (!/^image\//.test(f.type)) { alert('只能上传图片'); return; }
-      if (f.size > 5 * 1024 * 1024) { alert('图片不能超过 5 MB'); return; }
+      var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+      var ext0 = (f.name.split('.').pop() || '').toLowerCase();
+      var okExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'].indexOf(ext0) > -1;
+      if (allowed.indexOf(f.type) === -1 && !okExt) {
+        alert('这个格式浏览器显示不了（iPhone 的 HEIC 常见）。\n请先在手机上转成 JPG/PNG 再传：\n设置 → 相机 → 格式 → 选「兼容性最佳」，或者用微信发给自己再保存。');
+        return;
+      }
+      if (f.size > 8 * 1024 * 1024) { alert('图片不能超过 8 MB'); return; }
 
       var statusEl = $('gallery-status');
       if (statusEl) statusEl.textContent = '上传中…';
