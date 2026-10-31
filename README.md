@@ -362,7 +362,7 @@ python -m http.server 8000
      provider: "supabase",
      supabaseUrl: "https://abcdefgh.supabase.co",
      supabaseAnonKey: "eyJhbGciOi...",
-     requireApproval: true
+     requireApproval: false
    }
    ```
 

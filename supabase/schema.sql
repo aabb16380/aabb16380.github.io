@@ -56,7 +56,7 @@ create table if not exists public.post_comments (
   slug       text not null,
   name       text not null default '匿名',
   body       text not null,
-  approved   boolean not null default false,
+  approved   boolean not null default true,
   created_at timestamptz not null default now()
 );
 
@@ -208,8 +208,7 @@ create policy "comments insertable" on public.post_comments
   with check (
     char_length(body) between 1 and 800
     and char_length(name) <= 20
-    and approved = false
-  );
+      );
 
 -- ============================================================
 -- 权限：匿名用户只能调用上面这些函数
@@ -226,3 +225,26 @@ grant execute on function public.increment_like(text)       to anon;
 -- ============================================================
 -- 审核评论：Table Editor → post_comments → 把 approved 勾成 true
 -- ============================================================
+
+-- ---------- 防重复提交：同篇同文 30 秒内最多 5 条 ----------
+create or replace function public.comment_guard()
+returns trigger
+language plpgsql security definer set search_path = public
+as $fn$
+begin
+  if (
+    select count(*) from public.post_comments
+    where slug = new.slug
+      and body = new.body
+      and created_at > now() - interval '30 seconds'
+  ) >= 5 then
+    raise exception 'too many identical comments';
+  end if;
+  return new;
+end;
+$fn$;
+
+drop trigger if exists comment_guard_trg on public.post_comments;
+create trigger comment_guard_trg
+  before insert on public.post_comments
+  for each row execute function public.comment_guard();
