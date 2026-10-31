@@ -44,11 +44,11 @@
   --radius-sm: 2px;
 
   /* 字体 */
-  --serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong",
+  --serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "STSong",
     Georgia, "Times New Roman", serif;
-  --sans: "Noto Sans SC", system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC",
+  --sans: "Noto Sans SC", "Plangothic", system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", "PingFang SC",
     "Hiragino Sans GB", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", monospace;
+  --mono: "JetBrains Mono", "Menlo", ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", monospace;
 }
 
 *,
