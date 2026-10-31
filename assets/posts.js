@@ -84,7 +84,7 @@ window.ZJ_POSTS = [
     "body": "<p class=\"poem\">一寸宙金一吨金，<br>千金难买寸宙金。</p>\n      <p class=\"poem\">但使四中宙金在，<br>不教乐言得金牌。</p>"
   },
   {
-    "slug": "zizhuan-1",
+    "slug": "zizhuan-1-en",
     "cat": "zi",
     "title": "Autobioligy - Scatter notes after NHSML '26",
     "date": "2026-09-21",
