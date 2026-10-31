@@ -192,7 +192,7 @@ li { list-style: none; }
 .nav {
   display: flex;
   gap: 2px;
-  margin-left: auto;
+  margin-left: 26px;
 }
 .nav a {
   padding: 8px 14px;
@@ -203,7 +203,9 @@ li { list-style: none; }
 }
 .nav a:hover { color: var(--brand); background: transparent; }
 
-.header-tools { display: flex; align-items: center; gap: 6px; }
+.header-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.header-tools .admin-link { padding: 8px 12px; font-size: 13.5px; color: var(--muted); }
+.header-tools .admin-link:hover { color: var(--brand); }
 
 .icon-btn {
   display: grid;
@@ -1299,4 +1301,34 @@ img.brand-mark { object-fit: cover; }
   .deed { flex-wrap: wrap; }
   .deed-side { margin-left: auto; }
   .deed-score-big { font-size: 24px; }
+}
+/* ---------- 首屏：横排跳转按钮 ---------- */
+.hero-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 26px;
+}
+.hero-jump a {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .02em;
+  transition: color .18s ease, border-color .18s ease, background-color .18s ease, transform .15s ease;
+}
+.hero-jump a:hover {
+  color: var(--brand);
+  border-color: var(--brand);
+  background: rgba(255, 90, 60, .08);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .header-tools .admin-link { padding: 6px 8px; font-size: 12.5px; }
+  .hero-jump { margin-top: 20px; gap: 7px; }
+  .hero-jump a { padding: 6px 13px; font-size: 12.5px; }
 }

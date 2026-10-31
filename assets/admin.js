@@ -249,7 +249,14 @@
       e.preventDefault();
       if (window.ZJ_ADMIN.active) { logout(); } else { openLogin(); }
     });
-    nav.appendChild(a);
+    // 菜单移到左上角后，管理员入口放到右侧工具区，避免挤在一起
+    var tools = document.querySelector('.header-tools');
+    if (tools) {
+      a.classList.add('admin-link');
+      tools.insertBefore(a, tools.firstChild);
+    } else {
+      nav.appendChild(a);
+    }
   }
 
   function verify() {
