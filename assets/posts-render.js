@@ -88,6 +88,10 @@
         var la = likeOf(a.slug), lb = likeOf(b.slug);
         if (la !== lb) return lb - la;
       }
+      if (sortMode === 'comments') {
+        var c1 = commentsOf(a.slug), c2 = commentsOf(b.slug);
+        if (c1 !== c2) return c2 - c1;
+      }
       if (sortMode === 'mixed') {
         // 综合 = 阅读 + 点赞 × 4 + 评论 × 2
         var ma = viewsOf(a.slug) + likeOf(a.slug) * 4 + commentsOf(a.slug) * 2;
@@ -116,7 +120,8 @@
     var opts = [
       { key: 'mixed', name: '综合' },
       { key: 'time', name: '按时间' },
-      { key: 'likes', name: '按点赞' }
+      { key: 'likes', name: '按点赞' },
+      { key: 'comments', name: '按评论' }
     ];
     sortEl.innerHTML = opts.map(function (o) {
       return '<button type="button" class="sort-chip' + (o.key === sortMode ? ' active' : '') +
@@ -141,6 +146,7 @@
             '<span class="post-meta-right">' +
               (n > 0 ? '<span class="post-likes">👍 ' + n + '</span>' : '') +
               (viewsOf(p.slug) > 0 ? '<span class="post-views">阅读 ' + viewsOf(p.slug) + '</span>' : '') +
+              (commentsOf(p.slug) > 0 ? '<span class="post-comments" title="评论数">💬 ' + commentsOf(p.slug) + '</span>' : '') +
               '<time class="post-date">' + esc(fmtDate(p.date)) + '</time>' +
             '</span>' +
           '</div>' +
@@ -174,7 +180,7 @@
     if (descEl) {
       var c = catMap[active];
       descEl.textContent = active === 'all'
-        ? (sortMode === 'mixed' ? '按点赞与阅读量综合排序，点开任意一篇即可留言。' : (sortMode === 'likes' ? '按点赞量排序，点开任意一篇即可留言。' : '按时间倒序排列，点开任意一篇即可留言。'))
+        ? (sortMode === 'mixed' ? '按阅读、点赞与评论综合排序，点开任意一篇即可留言。' : (sortMode === 'likes' ? '按点赞量排序，点开任意一篇即可留言。' : (sortMode === 'comments' ? '按评论数排序，点开任意一篇即可参与讨论。' : '按时间倒序排列，点开任意一篇即可留言。')))
         : (c ? c.desc : '');
     }
   }

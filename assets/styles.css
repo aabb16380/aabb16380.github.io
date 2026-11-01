@@ -1642,3 +1642,10 @@ body.admin-mode .view-count:hover { color: var(--brand); border-bottom-color: va
 }
 .tl-admin .admin-btn.danger { color: #ff6b5c; border-color: rgba(255, 107, 92, .45); }
 .tl-admin .admin-btn:disabled { opacity: .3; cursor: default; }
+/* ---------- 列表里的评论数 ---------- */
+.post-comments {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  opacity: .85;
+}
