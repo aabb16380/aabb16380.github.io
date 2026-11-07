@@ -19,5 +19,10 @@ window.ZJ_CONFIG = {
     supabaseUrl: "https://gnyfbgfdbyspjoyehhce.supabase.co",        // ← 例："https://abcdefghijkl.supabase.co"
     supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdueWZiZ2ZkYnlzcGpveWVoaGNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MzA5NDcsImV4cCI6MjEwOTAwNjk0N30.UTfL7eTfSLS06PoA6E-GBlMDEUIVJSLJ-OUg5-FVQ6g",    // ← 例："eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...."
     requireApproval: false  // false = 评论发出即显示；true = 需审核
+  },
+
+  // 功能开关：false = 关闭（前端不再请求对应接口，省流量）
+  features: {
+    gallery: false    // 图集：图片经 Supabase Storage 传输，流量消耗大
   }
 };

@@ -17,14 +17,14 @@
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="assets/favicon.png?v=20261031a8" type="image/png">
+<link rel="icon" href="assets/favicon.png?v=20261107b1" type="image/png">
 <script>
-window.ZJ_BUILD = '20261031a8';
+window.ZJ_BUILD = '20261107b1';
 window.__ZJ_T = (function () {
   var m = (location.search || '').match(/[?&]t=([^&]+)/);
   return m ? '&t=' + encodeURIComponent(m[1]) : '';
 })();
-document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031a8' + window.__ZJ_T + '">');
+document.write('<link rel="stylesheet" href="assets/styles.css?v=20261107b1' + window.__ZJ_T + '">');
 </script>
 
 <!-- 尽早标记 js，避免动画元素先显示再隐藏 -->
@@ -37,8 +37,8 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031a8' + w
 <header class="site-header" id="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="#top" aria-label="回到顶部">
-      <img class="brand-mark" src="assets/icon.png?v=20261031a8" alt="宙金" width="34" height="34">
-      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v3.1</span></span>
+      <img class="brand-mark" src="assets/icon.png?v=20261107b1" alt="宙金" width="34" height="34">
+      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v3.2</span></span>
     </a>
 
     <nav class="nav" id="nav" aria-label="主导航">
@@ -214,34 +214,21 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031a8' + w
     </div>
   </section>
 
-  <!-- ========== 05 图集 ========== -->
-  <section class="section section-alt" id="gallery">
-    <div class="wrap">
-      <header class="section-head reveal">
-        <span class="section-index">05</span>
-        <h2>图集</h2>
-        <p class="section-sub">综合排序取前三。点开看大图，也可以上传自己的。</p>
-      </header>
-      <div class="deed-head">
-        <div class="sort-bar" id="gallery-sort" role="group" aria-label="图集排序"></div>
+  <!-- ========== 05 图集（暂停） ========== -->
+    <section class="section section-alt" id="gallery">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <span class="section-index">05</span>
+          <h2>图集</h2>
+          <p class="section-sub">暂停开放</p>
+        </header>
+        <div class="gallery-paused">
+          <p class="gp-title">图集暂时关闭</p>
+          <p class="gp-text">由于 Supabase 流量紧张，暂时关闭图集功能。</p>
+          <p class="gp-hint">已经上传的图片都还在，恢复后会原样出现。</p>
+        </div>
       </div>
-      <div class="gallery-grid" id="gallery-grid">
-        <div class="skeleton sk-shot"></div>
-        <div class="skeleton sk-shot"></div>
-        <div class="skeleton sk-shot"></div>
-        <p class="loading-note">加载中…</p>
-      </div>
-      <button class="more-btn" id="gallery-more" type="button" hidden></button>
-      <p class="gallery-empty" id="gallery-empty" hidden>还没有图片，来传第一张。</p>
-      <div class="gallery-actions">
-        <label class="btn ghost gallery-upload">
-          上传图片
-          <input type="file" id="gallery-file" accept="image/*" hidden>
-        </label>
-        <span class="gallery-status" id="gallery-status"></span>
-      </div>
-    </div>
-  </section>
+    </section>
 
   <div class="lightbox" id="lightbox" hidden>
     <div class="lightbox-inner">
@@ -279,7 +266,7 @@ document.write('<link rel="stylesheet" href="assets/styles.css?v=20261031a8' + w
     ['assets/main.js', true]
   ];
   for (var i = 0; i < list.length; i++) {
-    document.write('<script src="' + list[i][0] + '?v=20261031a8' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
+    document.write('<script src="' + list[i][0] + '?v=20261107b1' + T + '"' + (list[i][1] ? ' defer' : '') + '><\/script>');
   }
 })();
 </script>

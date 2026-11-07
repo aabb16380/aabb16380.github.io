@@ -27,7 +27,7 @@ document.write('<link rel="stylesheet" href="assets/log.css?v=20261031a4' + wind
   <div class="wrap header-inner">
     <a class="brand" href="index.html" aria-label="返回首页">
       <img class="brand-mark" src="assets/icon.png?v=20261031a4" alt="宙金" width="34" height="34">
-      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v3.1</span></span>
+      <span class="brand-text"><span class="brand-name">zhoujin.site</span><span class="brand-ver" id="brand-ver">v3.2</span></span>
     </a>
 
     <nav class="nav" id="nav" aria-label="主导航">
@@ -55,10 +55,20 @@ document.write('<link rel="stylesheet" href="assets/log.css?v=20261031a4' + wind
 
     <header class="log-head">
       <h1>更新日志</h1>
-      <p class="log-sub">这个站点每一次改动都记在这里。当前版本 <strong id="log-current">v3.1</strong>。</p>
+      <p class="log-sub">这个站点每一次改动都记在这里。当前版本 <strong id="log-current">v3.2</strong>。</p>
     </header>
 
     <ol class="log-list" id="log-list">
+      <li class="log-item">
+        <div class="log-ver">v3.2</div>
+        <div class="log-body">
+          <h2>暂停图集</h2>
+          <ul>
+            <li>图集暂时关闭，页面显示「由于 Supabase 流量紧张，暂时关闭图集功能」。</li>
+            <li>关闭期间前端不再请求图片数据，也不会上传；已上传的图片保留在服务器。</li>
+          </ul>
+        </div>
+      </li>
       <li class="log-item">
         <div class="log-ver">v3.1</div>
         <div class="log-body">

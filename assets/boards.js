@@ -15,6 +15,9 @@
   var H = { apikey: key, Authorization: 'Bearer ' + key };
   var HJ = { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' };
 
+  var FEATURES = (window.ZJ_CONFIG && window.ZJ_CONFIG.features) || {};
+  var GALLERY_ON = FEATURES.gallery !== false;
+
   var state = { quotes: [], deeds: [], photos: [], quoteLikes: {}, quoteExpanded: false, galleryExpanded: false, photoOrder: [], deedSort: 'mixed', deedExpanded: false, gallerySort: 'mixed' };
 
   function $(id) { return document.getElementById(id); }
@@ -327,6 +330,7 @@
   }
 
   function loadGallery() {
+    if (!GALLERY_ON) return Promise.resolve();   // 图集关闭：不请求，省流量
     return get('photos', 'select=id,url,caption,created_at,score_sum,score_count&order=created_at.desc')
       .then(function (rows) { state.photos = rows || []; renderGallery(); });
   }
